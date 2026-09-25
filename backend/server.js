@@ -2,8 +2,8 @@ const express = require('express');
 const path = require('path');
 const cors = require('cors');
 const fs = require('fs');
+const { connectDB } = require('./config/db'); // Panggil koneksi DB di atas
 
-// Inisialisasi Express App
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -12,7 +12,10 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Handling Folder Uploads secara Aman (jika folder ada)
+// Buka koneksi Database di Vercel Serverless
+connectDB().catch((err) => console.error('DB Connection Error:', err));
+
+// Handling Folder Uploads secara Aman
 const uploadsDir = path.join(__dirname, 'uploads');
 if (fs.existsSync(uploadsDir)) {
   app.use('/uploads', express.static(uploadsDir, {
@@ -30,33 +33,20 @@ app.get('/', (req, res) => {
   });
 });
 
-// Import Routes API dengan Try-Catch agar tidak crash saat initialization
-try {
-  app.use('/api/home', require('./routes/homeRoutes'));
-  app.use('/api/programs', require('./routes/programRoutes'));
-  app.use('/api/about', require('./routes/aboutRoutes'));
-  app.use('/api/ticketing', require('./routes/ticketingRoutes'));
-  app.use('/api/venue', require('./routes/venueRoutes'));
-  app.use('/api/films', require('./routes/filmRoutes'));
-} catch (err) {
-  console.error('Error loading routes:', err.message);
-}
+// Import Routes Langsung Tanpa Try-Catch (Agar jika error terlihat jelas di Vercel Logs)
+app.use('/api/home', require('./routes/homeRoutes'));
+app.use('/api/programs', require('./routes/programRoutes'));
+app.use('/api/about', require('./routes/aboutRoutes'));
+app.use('/api/ticketing', require('./routes/ticketingRoutes'));
+app.use('/api/venue', require('./routes/venueRoutes'));
+app.use('/api/films', require('./routes/filmRoutes'));
 
-// Ekspor Modul Express untuk Vercel Serverless Function (WAJIB)
+// Ekspor Modul Express untuk Vercel Serverless Function
 module.exports = app;
 
-// Hanya jalankan app.listen di Local Machine
+// Jalankan app.listen hanya untuk Local Machine
 if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
-  const { connectDB } = require('./config/db');
-  const startApp = async () => {
-    try {
-      await connectDB();
-      app.listen(PORT, () => {
-        console.log(`Server running locally on http://localhost:${PORT}`);
-      });
-    } catch (error) {
-      console.error('Gagal menjalankan server lokal:', error.message);
-    }
-  };
-  startApp();
+  app.listen(PORT, () => {
+    console.log(`Server running locally on http://localhost:${PORT}`);
+  });
 }
