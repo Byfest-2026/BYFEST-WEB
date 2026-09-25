@@ -1,0 +1,446 @@
+/* ==========================================================
+ * 1. TAILWIND & GENERAL SETUP
+ * ========================================================== */
+@import "tailwindcss";
+
+.schedule-main {
+  @apply min-h-screen w-full flex flex-col items-center justify-between;
+  background: linear-gradient(180deg, #0ECDF1, #6024A9, #090E14);
+}
+
+.schedule-container {
+  /* Ubah pt-[60px] menjadi lebih tinggi, misalnya pt-[100px] atau pt-[120px] agar aman dari Navbar */
+  @apply w-full max-w-7xl mx-auto flex flex-col items-center gap-2 pt-[100px] px-4 transition-all duration-300;
+}
+
+/* Bungkus Badge Tanggal: Atur jarak bawah agar sangat rapat dengan judul */
+.schedule-date-badge-wrapper {
+  @apply w-full flex justify-center mb-1; /* Menggunakan mb-1 agar rapat ke bawah */
+}
+
+/* Bungkus Header SCHEDULE: Atur jarak atas agar rapat ke tanggal, dan jarak bawah ke deskripsi */
+.schedule-header-wrapper {
+  @apply w-full flex justify-center mt-0 mb-4; /* mt-0 agar tidak ada jarak tambahan dari tanggal */
+}
+
+/* Gambar Badge Tanggal: Dibuat lebih kecil (maksimal 180px di mobile) */
+.schedule-date-badge-img {
+  @apply max-w-[180px] md:max-w-[260px] h-auto block shrink-0;
+}
+
+/* Gambar Header SCHEDULE: Dibuat BESAR (maksimal 80% lebar layar mobile) */
+.schedule-header-img {
+  @apply w-full max-w-[300px] md:max-w-[600px] h-auto block shrink-0;
+}
+
+.schedule-description {
+  @apply font-sans font-normal text-[12px] leading-[140%] text-center text-white max-w-[300px] md:max-w-none mb-4;
+}
+
+.mobile-dropdown-wrapper {
+  @apply relative z-50 w-full max-w-[340px] block md:hidden mb-4;
+}
+
+.mobile-select-box {
+  @apply w-full px-4 py-3 bg-[#1e293b]/80 backdrop-blur-md text-white border border-white/30 rounded-2xl text-sm font-medium outline-none cursor-pointer shadow-lg;
+}
+
+/* ==========================================================
+ * PROGRAM FILTER STYLING (Gaya Kapsul Figma & Desktop Single Pill)
+ * ========================================================== */
+@layer components {
+  /* --- CONTAINER UTAMA FILTER --- */
+  .filter-container-main {
+    @apply w-full flex justify-center items-center;
+  }
+
+  /* --- DESKTOP SINGLE PILL CONTAINER (SESUAI REFERENSI GAMBAR) --- */
+  .desktop-filter-pill-container {
+    @apply hidden md:flex bg-white/5 backdrop-blur-md border border-white/12 rounded-full p-1 gap-1 shadow-2xl;
+  }
+
+  .filter-pill-item {
+    @apply px-5 py-2 bg-transparent text-zinc-400 rounded-full text-sm font-medium cursor-pointer transition-all duration-200 whitespace-nowrap border-none;
+  }
+
+  .filter-pill-item:hover {
+    @apply text-white;
+  }
+
+  /* Tombol Aktif dengan Gradasi Pink-Cyan */
+  .filter-pill-item.active {
+    @apply bg-gradient-to-r from-pink-500 to-cyan-500 text-white font-semibold shadow-md shadow-pink-500/30;
+  }
+}
+
+.custom-dropdown-menu {
+  @apply absolute top-full left-0 w-full mt-2 bg-[#090E14]/40 backdrop-blur-2xl border border-white/20 rounded-xl shadow-2xl overflow-hidden py-1 z-50;
+}
+
+.custom-dropdown-item {
+  @apply px-5 py-3 text-sm text-white hover:bg-white/15 cursor-pointer transition-colors border-b border-white/10 last:border-none;
+}
+
+/* ==========================================================
+ * ALL PROGRAMS HEADER TITLE STYLING
+ * ========================================================== */
+
+/* Wrapper ini sebelumnya tidak punya width sama sekali, sehingga di dalam
+ * .schedule-container (flex-col items-center) dia shrink-to-fit dan
+ * membuat .cards-grid di dalamnya salah hitung lebar (kartu jadi dempet). */
+.all-programs-wrapper {
+  @apply w-full;
+}
+
+.all-programs-title-wrapper {
+  @apply flex flex-col items-center gap-1 w-full mt-2 mb-2;
+}
+
+.all-programs-subtitle {
+  @apply font-sans text-[18px] md:text-[18px] font-semibold tracking-widest text-white uppercase;
+}
+
+.all-programs-main-title {
+  @apply font-sans text-[20px] md:text-[28px] lg:text-[32px] font-extrabold tracking-wide text-white uppercase m-0;
+}
+
+.cards-grid {
+  @apply w-full max-w-full mx-auto flex flex-nowrap items-center gap-4 px-4 pb-8 overflow-x-auto scrollbar-none;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  cursor: grab;
+}
+
+.cards-grid.is-dragging {
+  cursor: grabbing;
+  scroll-snap-type: none;
+  user-select: none;
+}
+
+/* ==========================================================
+ * 3. DIVIDER
+ * ========================================================== */
+.film-divider {
+  @apply w-full max-w-4xl flex items-center justify-center gap-3 my-1;
+}
+
+.film-divider-line {
+  @apply h-[1px] bg-white/40 flex-1;
+}
+
+.film-divider-text {
+  @apply text-[11px] md:text-xs font-extrabold tracking-wider text-white text-center uppercase;
+}
+
+/* ==========================================================
+ * 4. PROGRAM SECTION & CARD SPECIFICATIONS (Ultra-Close Columns)
+ * ========================================================== */
+
+/* Card Utama & Card Film
+ * Base (mobile-first) = w-full, cocok untuk grid 1 kolom di halaman detail.
+ * md: ke atas = ukuran & margin desktop ASLI, TIDAK diubah sama sekali.
+ * Efek "peek" (85vw, mengintip kartu berikutnya) khusus untuk mobile
+ * scroll horizontal di bawah, DI-SCOPE hanya ke dalam .cards-grid yang
+ * BUKAN .detail-films-grid, supaya halaman detail (grid 2 kolom) tidak ikut kepotong.
+ *
+ * ProgramCard = gradient ungu solid, padding di container.
+ * FilmCard = border putih tipis, overflow-hidden, cover nempel ke tepi atas
+ * (padding dipindah ke .film-card-body), bagian bawah warna ungu solid.
+ */
+.program-card,
+.pg-card-container {
+  @apply w-full max-w-[350px] p-[16px] gap-[10px] shrink-0 snap-center 
+         rounded-[24px] 
+         bg-[linear-gradient(180deg,#2C1454_0%,#4E1F91_100%)]
+         shadow-[0_8px_20px_rgba(0,0,0,0.25)] 
+         flex flex-col box-border text-white
+         transition-all duration-300 ease-in-out 
+         hover:-translate-y-1 hover:shadow-[0_10px_24px_rgba(120,40,200,0.4)];
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.film-card-container {
+  @apply w-full max-w-[350px] gap-0 shrink-0 snap-center 
+         rounded-[24px] border border-solid border-white/40 
+         bg-[#4C1D95] overflow-hidden
+         shadow-[0_8px_20px_rgba(0,0,0,0.25)] 
+         flex flex-col box-border text-white
+         transition-all duration-300 ease-in-out 
+         hover:-translate-y-1 hover:shadow-[0_10px_24px_rgba(120,40,200,0.4)];
+  margin-left: 0;
+  margin-right: 0;
+}
+
+/* Mobile: tinggi FIXED + overflow-hidden, khusus biar ProgramCard & FilmCard
+ * selalu ukurannya identik dan muat utuh dalam satu layar (lihat request sebelumnya). */
+@media (max-width: 767px) {
+  .program-card,
+  .pg-card-container,
+  .film-card-container {
+    height: 500px;
+    overflow: hidden;
+  }
+}
+
+/* Desktop: PERILAKU ASLI - tinggi auto mengikuti konten, TIDAK PERNAH kepotong.
+ * Ini yang sempat ke-skip kemarin sehingga ikut kena fixed-height mobile. */
+@media (min-width: 768px) {
+  .program-card,
+  .pg-card-container,
+  .film-card-container {
+    min-height: 440px;
+    height: auto;
+    max-height: none;
+    overflow: visible;
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+}
+
+/* Efek "peek" khusus mobile untuk semua carousel horizontal
+ * (All Programs & film list di halaman detail) */
+@media (max-width: 767px) {
+  .cards-grid .program-card,
+  .cards-grid .pg-card-container,
+  .cards-grid .film-card-container {
+    width: 85vw;
+    max-width: 320px;
+  }
+}
+
+/* Poster Gambar dengan Rasio 16:9 */
+.program-card-img-box,
+.pg-card-banner {
+  @apply relative w-full aspect-[16/9] rounded-[16px] bg-[#D9D9D9] overflow-hidden shrink-0 bg-cover bg-center;
+}
+
+/* Cover FilmCard nempel di tepi atas card (tanpa padding/border/rounded bawah) */
+.film-card-cover {
+  @apply relative w-full aspect-[16/10] bg-[#D9D9D9] overflow-hidden shrink-0 bg-cover bg-center;
+}
+
+.program-card-body {
+  @apply flex flex-col w-full gap-3;
+}
+
+.film-card-body {
+  @apply flex flex-col w-full gap-2 p-4;
+}
+
+/* Menu & Teks di dalam card berukuran besar */
+.program-card-name,
+.pg-card-title {
+  @apply font-sans text-[16px] md:text-[18px] font-extrabold text-white leading-tight m-0 line-clamp-2 min-h-[34px] md:min-h-[38px] text-left;
+}
+
+.film-card-title {
+  @apply font-sans text-[18px] md:text-[20px] font-extrabold text-white leading-tight m-0 line-clamp-2 text-left;
+}
+
+.program-card-desc,
+.pg-card-desc {
+  @apply font-sans text-[12px] text-white/80 leading-snug m-0 text-left line-clamp-2;
+}
+
+.film-card-desc {
+  @apply font-sans text-[12px] text-white/85 leading-snug m-0 text-left line-clamp-2;
+}
+
+/* Divider tipis di bawah credits FilmCard */
+.film-card-divider-line {
+  @apply w-full h-[1px] bg-white/30 my-1 shrink-0;
+}
+
+/* Wadah List Informasi (Tanggal, Waktu, Lokasi) - tanpa kotak background */
+.program-info-list {
+  @apply flex flex-col gap-1.5 my-1;
+}
+
+.program-info-item,
+.pg-card-curator-box {
+  @apply flex items-center gap-2 font-sans text-[12px] font-normal text-white;
+}
+
+.info-icon,
+.pg-card-curator-icon {
+  @apply w-4 h-4 text-white shrink-0;
+}
+
+.program-badges-row {
+  @apply flex items-center gap-2 flex-wrap my-1 justify-start;
+}
+
+.film-card-tags-container {
+  @apply flex items-center gap-2 flex-wrap my-1 justify-start;
+}
+
+/* Badge program: pill solid, teks bold */
+.badge-pill,
+.pg-card-badge {
+  @apply px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider;
+}
+
+.badge-age {
+  @apply bg-[#E8C547] text-[#3B2A00];
+}
+
+.badge-films {
+  @apply bg-[#3FA76B] text-white;
+}
+
+.badge-runtime {
+  @apply bg-[#E0724A] text-white;
+}
+
+/* Badge film: masing-masing gaya beda sesuai desain */
+.film-badge-time {
+  @apply px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border border-[#E0475C] text-[#FF6B81] bg-[#E0475C]/10;
+}
+
+.film-badge-genre {
+  @apply px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-[#3B5BA9] text-white;
+}
+
+.film-badge-age {
+  @apply px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-[#3FA76B] text-white;
+}
+
+.film-badge-duration {
+  @apply px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border border-white/60 text-white;
+}
+
+/* Tombol View Detail */
+.program-btn-detail,
+.pg-card-btn {
+  @apply w-full py-2.5 rounded-full 
+         bg-gradient-to-r from-[#7B2FF7] to-[#F9099A] 
+         text-white font-sans text-[13px] font-extrabold 
+         tracking-wide shadow-md cursor-pointer 
+         flex justify-center items-center mt-auto
+         transition-all duration-200 hover:brightness-110 hover:scale-[1.02] active:scale-[0.98];
+}
+
+.program-btn-detail a {
+  @apply w-full h-full flex items-center justify-center text-white no-underline;
+}
+
+.program-ticket-note,
+.pg-card-note {
+  @apply font-sans text-[9.5px] font-medium text-[#FF3366] text-center mt-2 m-0 tracking-tight;
+}
+
+/* ==========================================================
+ * 5. FILM CARD EXTRAS
+ * ========================================================== */
+.film-card-header {
+  @apply flex flex-col w-full gap-0.5;
+}
+
+.film-card-credits {
+  @apply text-white/70 font-sans text-[11px] leading-snug;
+}
+
+.film-card-credits-bold {
+  @apply text-white font-semibold;
+}
+
+.film-card-credits-divider {
+  @apply mx-1 text-white/40;
+}
+
+/* Layout Utama Halaman Detail: Kiri & Kanan
+ * Menggunakan CSS Grid dengan penempatan eksplisit (grid-area) per elemen,
+ * BUKAN flex-row sederhana. Ini sengaja dibuat robust terhadap struktur JSX:
+ * baik ketiga elemen (detail-program-header, film-divider, cards-grid) ada
+ * sebagai children langsung dari .detail-section, ATAUPUN film-divider &
+ * cards-grid dibungkus dalam .program-films-container, layout desktop akan
+ * tetap benar karena setiap elemen diberi grid-area sendiri secara eksplisit.
+ */
+.detail-section {
+  @apply w-full max-w-[1320px] mx-auto px-4 py-8 relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "header"
+    "divider"
+    "films";
+  gap: 1.5rem;
+  align-items: start;
+  justify-content: center;
+}
+
+@media (min-width: 1024px) {
+  .detail-section {
+    grid-template-columns: 380px 1fr;
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+      "header divider"
+      "header films";
+    column-gap: 2rem;
+    row-gap: 1rem;
+  }
+}
+
+/* Membuat card di kiri tetap fix/sticky di posisinya saat halaman di-scroll */
+.detail-program-header {
+  grid-area: header;
+  @apply w-full lg:w-[380px] shrink-0 lg:sticky lg:top-24 flex justify-center self-start;
+}
+
+/* Berlaku baik sebagai wrapper (.program-films-container membungkus
+ * divider+grid) MAUPUN sebagai elemen lepas langsung: keduanya diberi
+ * grid-area sendiri di bawah, jadi urutan/nesting JSX tidak lagi krusial. */
+.program-films-container {
+  grid-area: films;
+  @apply w-full flex flex-col gap-4;
+  display: contents;
+}
+
+.detail-section > .film-divider,
+.program-films-container > .film-divider {
+  grid-area: divider;
+}
+
+.detail-section > .cards-grid.detail-films-grid,
+.program-films-container > .cards-grid.detail-films-grid {
+  grid-area: films;
+}
+
+/* Grid Film di Kanan (desktop): 2 kolom rapi ke bawah.
+ * Di mobile: jadi carousel horizontal peek-scroll, sama seperti All Programs.
+ * Jarak antar card film dibuat sedikit lebih lebar dari gap default cards-grid. */
+.cards-grid.detail-films-grid {
+  @apply w-full grid grid-cols-1 gap-5 justify-items-center m-0 p-0;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+@media (max-width: 767px) {
+  .cards-grid.detail-films-grid {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    justify-items: unset;
+    justify-content: flex-start;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    cursor: grab;
+  }
+
+  .cards-grid.detail-films-grid.is-dragging {
+    cursor: grabbing;
+    scroll-snap-type: none;
+    user-select: none;
+  }
+}
+
+@media (min-width: 768px) {
+  .cards-grid.detail-films-grid {
+    @apply grid-cols-2;
+  }
+}

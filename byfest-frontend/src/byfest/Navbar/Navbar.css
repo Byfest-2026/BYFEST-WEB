@@ -1,0 +1,82 @@
+/* src/byfest/Navbar/Navbar.css */
+@import "tailwindcss";
+
+/* Header Pembungkus Luar - Selalu Full Screen (100%) */
+.byfest-navbar {
+  @apply fixed top-0 left-0 right-0 w-full z-50 bg-white/10 backdrop-blur-[10px] border-b border-black/10 box-border;
+}
+
+/* Pembungkus Konten - Membatasi Maksimal Lebar 1440px & Rata Tengah */
+.byfest-navbar-container {
+  @apply flex items-center justify-between px-6 py-3.5 mx-auto w-full max-w-[1440px] h-[64px] lg:h-[72px] lg:px-10;
+}
+
+.byfest-brand-group {
+  @apply flex items-center gap-3;
+}
+
+.byfest-brand-text {
+  @apply flex flex-col leading-[1.15];
+}
+
+.byfest-title {
+  @apply text-[0.95rem] md:text-[1.05rem] font-extrabold font-sans tracking-tight text-black;
+}
+
+.byfest-subtitle {
+  @apply text-[0.75rem] font-extrabold text-purple-700;
+}
+
+/* Hamburger Toggle Button */
+.byfest-hamburger {
+  @apply flex flex-col justify-center items-center gap-[5px] w-8 h-8 bg-transparent border-none cursor-pointer p-0 lg:hidden;
+}
+
+.byfest-hamburger-line {
+  @apply block w-6 h-[2.5px] bg-black transition-all duration-300 ease-in-out;
+}
+
+.byfest-hamburger.open .line-1 {
+  @apply rotate-45 translate-y-[7px];
+}
+
+.byfest-hamburger.open .line-2 {
+  @apply opacity-0;
+}
+
+.byfest-hamburger.open .line-3 {
+  @apply -rotate-45 -translate-y-[7px];
+}
+
+/* Dropdown Menu Mobile & Desktop Navigation */
+.byfest-dropdown {
+  @apply absolute left-0 top-full w-full border-b border-black/10 text-black hidden bg-white/95 backdrop-blur-md lg:static lg:bg-transparent lg:backdrop-filter-none lg:border-b-0 lg:w-auto lg:flex;
+}
+
+.byfest-dropdown.mobile-open {
+  @apply !block;
+}
+
+.byfest-menu-list {
+  @apply flex flex-col items-end gap-4 p-6 list-none m-0 lg:flex-row lg:items-center lg:gap-8 lg:p-0;
+}
+
+.byfest-menu-item {
+  @apply text-[16px] font-black text-black font-sans no-underline transition-colors duration-200 hover:text-purple-700 lg:text-[15px] lg:font-bold;
+}
+
+/* After Movie Section */
+.byfest-aftermovie-card {
+  @apply flex flex-col items-start gap-[10px] p-[10px] w-[337px] h-[180px] rounded-[20px];
+  background: rgba(255, 255, 255, 0.08); /* visual fill opsional untuk kartu */
+  backdrop-filter: blur(10px);
+}
+
+.byfest-aftermovie-title {
+  @apply text-white text-[12px] font-normal leading-normal;
+  font-family: var(--font-helvetica), sans-serif;
+}
+
+.byfest-aftermovie-video {
+  @apply w-full h-[130px] rounded-[12px] bg-neutral-800/60 overflow-hidden flex items-center justify-center;
+}

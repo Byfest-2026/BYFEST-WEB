@@ -1,0 +1,28 @@
+# Dependency & Installed Packages (semua folder)
+**/node_modules/
+node_modules/
+
+# Environment Variables & Secrets (semua folder)
+**/.env
+**/.env.*
+.env
+.env*.local
+
+# Build outputs (Frontend & Backend)
+**/.next/
+**/dist/
+**/build/
+.next/
+dist/
+build/
+
+# Uploaded media files (Backend)
+**/uploads/
+uploads/
+
+# OS & Log Files
+.DS_Store
+Thumbs.db
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

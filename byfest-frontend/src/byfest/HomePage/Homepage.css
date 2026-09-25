@@ -1,0 +1,405 @@
+/* src/byfest/Navbar/Navbar.css */
+@import "tailwindcss";
+
+/* ==========================================
+   Hero Section - Responsive All Devices
+   ========================================== */
+.hero-outer-wrapper {
+  @apply relative w-full mx-auto overflow-hidden bg-[#090E14] box-border;
+}
+
+.hero-aspect-box {
+  @apply relative w-full aspect-[402/874] sm:aspect-[402/750] md:aspect-auto md:min-h-screen md:h-dvh md:max-w-none mx-auto overflow-hidden;
+}
+
+.hero-bg-wrapper {
+  @apply absolute inset-0 w-full h-full z-0;
+}
+
+.hero-img-cover {
+  @apply object-cover object-center w-full h-full;
+}
+
+.hero-title-wrapper {
+  @apply absolute top-[30%] left-1/2 -translate-x-1/2 w-[82%] h-[22%] 
+         md:top-[16%] md:left-1/2 md:-translate-x-1/2 md:w-[68%] md:h-[52%] z-10;
+}
+
+.hero-img-contain {
+  @apply object-contain;
+}
+
+.hero-bubble-wrapper {
+  @apply absolute right-[4%] top-[0%] w-[24.4%] h-[25%] 
+         md:right-[1.5%] md:top-0 md:w-[15%] md:h-[46%] z-20 pointer-events-none;
+}
+
+.hero-btn-reserve {
+  @apply absolute top-[54%] left-1/2 -translate-x-1/2 w-[72%] max-w-[270px] 
+         md:top-[73%] md:max-w-[300px] py-[3%] md:py-[12px] rounded-full border border-black text-white font-sans text-[14px] md:text-[16px] font-bold text-center shadow-[0_4px_4px_0_rgba(0,0,0,0.25)] bg-gradient-to-r from-[#12BE50] to-[#F8F140] z-20 flex items-center justify-center no-underline transition-all duration-150 ease-in-out whitespace-nowrap hover:scale-[1.03] active:scale-[0.97];
+}
+
+.hero-strip {
+  @apply absolute bottom-0 left-0 z-20 w-full py-[8px] md:py-[12px] bg-[#FFFF00] text-[#090E14] font-sans text-[clamp(10px,2.8vw,13px)] md:text-base font-semibold text-center tracking-[0.08em] select-none border-t border-black/10;
+}
+
+/* ==========================================
+   TRAILER SECTION (FIXED MOBILE + FULL-BLEED DESKTOP)
+   ========================================== */
+
+.trailer-section {
+  @apply relative w-full bg-[#0ECDF1] overflow-hidden select-none 
+         flex justify-center items-center box-border;
+}
+
+.trailer-grid-wrapper {
+  @apply absolute inset-0 w-full h-full pointer-events-none z-0;
+}
+
+/* Scalable Canvas */
+.trailer-canvas {
+  @apply relative w-full max-w-[1440px] mx-auto z-10
+         aspect-[402/328] lg:aspect-[1440/1024];
+}
+
+/* Helper Class Image */
+.trailer-img-fill {
+  @apply w-full h-full object-fill;
+}
+
+.trailer-img-cover {
+  @apply w-full h-full object-cover object-center;
+}
+
+.trailer-img-contain {
+  @apply w-full h-full object-contain object-center;
+}
+
+/* 1. Gunung Kiri (Sesuai Asli di Mobile, Mentok Layar di Desktop) */
+.trailer-mountain-left {
+  @apply absolute bottom-0 left-0 pointer-events-none z-10
+         w-[42.79%] h-[81.71%]
+         flex items-end justify-start
+         /* Kunci hanya untuk Desktop (lg: / 1024px+) */
+         lg:left-[calc(50%-50vw)] lg:w-[50vw] lg:h-[83%]
+         min-[1920px]:h-[85%];
+}
+
+.trailer-mountain-left img,
+.trailer-mountain-left svg {
+  @apply w-full h-full object-contain object-left-bottom;
+}
+
+/* 2. Gunung Kanan (Sesuai Asli di Mobile, Mentok Layar di Desktop) */
+.trailer-mountain-right {
+  @apply absolute bottom-0 right-0 pointer-events-none z-10
+         w-[42.79%] h-[81.71%]
+         flex items-end justify-end
+         /* Kunci hanya untuk Desktop (lg: / 1024px+) */
+         lg:right-[calc(50%-50vw)] lg:w-[50vw] lg:h-[83%]
+         min-[1920px]:h-[85%];
+}
+
+.trailer-mountain-right img,
+.trailer-mountain-right svg {
+  @apply w-full h-full object-contain object-right-bottom;
+}
+
+/* 3. Title BYFEST 2026 */
+.trailer-title-wrapper {
+  @apply absolute left-1/2 -translate-x-1/2 pointer-events-none z-20
+         top-[3.65%] w-[47.26%] h-[30.48%]
+         lg:top-[2.93%] lg:w-[37.92%] lg:h-[30.86%]
+         min-[1920px]:top-[3%] min-[1920px]:w-[36%];
+}
+
+/* 4. Frame Video Outer */
+.trailer-video-outer {
+  @apply absolute left-1/2 -translate-x-1/2 z-30
+         flex items-center justify-center pointer-events-auto top-[-50%]
+         /* Mobile */
+         top-[40.85%] bottom-auto w-[83.83%] h-[54.87%] 
+         p-[2.5%] rounded-[16px]
+         /* Desktop */
+         lg:top-auto lg:bottom-[5%] lg:w-[75%] lg:h-auto lg:aspect-video
+         lg:p-[1.5%] lg:rounded-[32px]
+         min-[1920px]:bottom-[8.5%] min-[1920px]:w-[70%] min-[1920px]:h-[50%]
+         min-[1920px]:p-[24px] min-[1920px]:rounded-[40px]
+         /* Frame Style */
+         bg-white/15 backdrop-blur-[6px] border border-white/30 
+         shadow-[0_8px_32px_0_rgba(0,0,0,0.3)];
+}
+
+.trailer-video-box {
+  @apply w-full h-full rounded-[10px] sm:rounded-[14px] lg:rounded-[24px] min-[1920px]:rounded-[32px] bg-black overflow-hidden shrink-0 ;
+}
+
+.trailer-iframe {
+  @apply w-full h-full border-none;
+}
+
+/* ==========================================
+   SECTION 3 - PROGRAM (Solid Background: Dark Magenta)
+   ========================================== */
+
+.program-section {
+  @apply relative w-full 
+         py-12 md:py-20 min-[1920px]:py-28 px-4 md:px-8 lg:px-12 
+         overflow-visible box-border flex flex-col items-center gap-8 md:gap-12 min-[1920px]:gap-16;
+  background: linear-gradient(180deg, #F9099A 0%, #090E14 100%);
+}
+
+.program-container {
+  @apply w-full max-w-7xl min-[1920px]:max-w-[1728px] mx-auto flex flex-col items-center gap-8 md:gap-12 min-[1920px]:gap-16;
+}
+
+.program-header {
+  @apply w-full flex flex-col items-center text-center gap-1.5 z-10;
+}
+
+.program-subtitle {
+  @apply font-sans text-[12px] md:text-sm min-[1920px]:text-base font-bold text-white/90 tracking-[0.2em] uppercase;
+}
+
+.program-title {
+  @apply font-sans text-[22px] md:text-3xl min-[1920px]:text-4xl font-extrabold text-white leading-[1.2] tracking-wide uppercase m-0;
+}
+
+.program-cards-scroll {
+  @apply w-full flex overflow-x-auto gap-4 md:gap-6 min-[1920px]:gap-8 
+         py-2 px-2 snap-x snap-mandatory z-20 
+         [scrollbar-width:none] [-ms-overflow-style:none];
+}
+
+.program-cards-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.program-card {
+  @apply w-[280px] md:w-[350px] shrink-0 snap-center p-4 md:p-5 
+         rounded-[20px] min-[1920px]:rounded-[24px] 
+         bg-[linear-gradient(214deg,rgba(249,9,154,0.15)_1.8%,rgba(96,36,169,0.15)_98.2%)] 
+         border border-white/30 
+         shadow-[0_8px_24px_rgba(0,0,0,0.2)] 
+         flex flex-col gap-3.5 box-border 
+         transition-all duration-300 ease-in-out 
+         hover:-translate-y-1.5 hover:border-[#F9099A];
+}
+
+.program-card-img-box {
+  @apply relative w-full h-[140px] md:h-[160px] min-[1920px]:h-[180px] rounded-[18px] bg-[#D9D9D9] overflow-hidden shrink-0;
+}
+
+.program-card-body {
+  @apply flex flex-col gap-2.5 w-full;
+}
+
+.program-card-name {
+  @apply font-sans text-[18px] md:text-xl min-[1920px]:text-2xl font-bold text-white leading-tight m-0;
+}
+
+.program-card-desc {
+  @apply font-sans text-[11px] md:text-xs min-[1920px]:text-sm text-white/80 leading-snug m-0;
+}
+
+.program-info-list {
+  @apply flex flex-col gap-1.5 my-1;
+}
+
+.program-info-item {
+  @apply flex items-center gap-2 font-sans text-[12px] min-[1920px]:text-sm font-medium text-white/90;
+}
+
+.info-icon {
+  @apply w-4 h-4 min-[1920px]:w-5 min-[1920px]:h-5 text-white/90 shrink-0;
+}
+
+.program-badges-row {
+  @apply flex items-center gap-2 flex-wrap my-1;
+}
+
+.badge-pill {
+  @apply px-3 py-1 rounded-full font-sans text-[10px] min-[1920px]:text-xs font-bold text-white uppercase tracking-wider;
+}
+
+.badge-age {
+  @apply bg-[#A6972B];
+}
+
+.badge-films {
+  @apply bg-[#2A8A63];
+}
+
+.badge-runtime {
+  @apply bg-[#AC4B41];
+}
+
+.program-btn-detail {
+  @apply w-full py-2.5 min-[1920px]:py-3 rounded-full 
+         bg-gradient-to-r from-[#7B2CBF] via-[#B5179E] to-[#E6007E] 
+         text-white font-['Inter'] text-[16px] md:text-[18px] font-semibold 
+         leading-normal tracking-[0.54px] [text-shadow:0_0_4px_rgba(0,0,0,0.25)] 
+         shadow-lg border border-white/20 cursor-pointer 
+         transition-all duration-200 hover:brightness-110 hover:scale-[1.02] active:scale-[0.98];
+}
+
+.program-ticket-note {
+  @apply font-sans text-[9px] min-[1920px]:text-[11px] font-medium text-[#FF3366] text-center m-0 tracking-tight;
+}
+
+/* ==========================================
+   CURATOR SECTION (RESPONSIVE 2-COL MOBILE & 3-COL DESKTOP)
+   ========================================== */
+
+.curator-section {
+  @apply relative w-full flex flex-col items-center justify-center gap-6 md:gap-8 z-10 
+         pt-5 md:pt-10 pb-16 md:py-24 px-4 overflow-visible; /* Sesuaikan nilai pt (padding-top) di sini */
+  background: linear-gradient(180deg, #090E14 0%, #F9099A 50%, #090E14 100%);
+}
+
+.curator-title {
+  @apply font-sans text-base md:text-2xl min-[1920px]:text-3xl font-extrabold text-white text-center tracking-wider uppercase m-0;
+}
+
+/* Container utama (melebar pas untuk 3 kolom di desktop) */
+.curator-card-box {
+  @apply w-full max-w-sm md:max-w-4xl min-[1920px]:max-w-6xl mx-auto 
+         p-3.5 md:p-8 min-[1920px]:p-10 
+         rounded-[24px] md:rounded-[36px] 
+         bg-black/40 border border-white/40 backdrop-blur-md box-border 
+         flex justify-center items-center;
+  box-shadow: 0 0 30px rgba(249, 9, 154, 0.25), inset 0 0 15px rgba(255, 255, 255, 0.1);
+}
+
+/* Flex wrap: Mobile 2 kolom, Desktop 3 kolom */
+.curator-grid {
+  @apply flex flex-wrap justify-center items-center 
+         gap-2.5 md:gap-4 min-[1920px]:gap-6 w-full;
+}
+
+/* Mobile: 2 per baris | Desktop: 3 per baris (Item ke-7 otomatis persis di tengah baris 3) */
+.curator-item {
+  @apply flex items-center justify-start gap-2.5 md:gap-3.5 
+         w-[calc(50%-0.35rem)] md:w-[calc(33.333%-0.75rem)] min-[1920px]:w-[calc(33.333%-1rem)] 
+         p-2 px-3 md:p-3.5 md:px-5 
+         rounded-[14px] md:rounded-[20px] 
+         bg-white/20 border border-white/40 backdrop-blur-sm 
+         transition-all duration-200 hover:scale-[1.02] hover:bg-white/25;
+}
+
+.curator-avatar-box {
+  @apply relative w-6 h-6 md:w-9 md:h-9 min-[1920px]:w-11 min-[1920px]:h-11 
+         rounded-full bg-white/90 overflow-hidden shrink-0;
+}
+
+.curator-name {
+  @apply font-sans text-[11px] md:text-sm min-[1920px]:text-base 
+         font-bold text-white truncate text-left;
+}
+
+/* ==========================================
+   DARK SPONSORS SECTION (TAILWIND REVISED & 4K)
+   ========================================== */
+
+.sponsors-container {
+  @apply w-full bg-transparent text-white box-border overflow-hidden flex flex-col items-center p-8 md:p-16 lg:p-20 gap-6 md:gap-10 lg:gap-12
+  ;background: linear-gradient(180deg, #090E14 51.92%, #FF6B22 100%);
+}
+
+.sponsors-header {
+  @apply flex flex-col items-center text-center gap-1.5;
+}
+
+.supported-by {
+  @apply text-[11px] lg:text-sm min-[2560px]:text-lg font-semibold tracking-[0.2em] text-gray-300 uppercase;
+}
+
+.sponsors-title {
+  @apply text-2xl md:text-4xl lg:text-5xl min-[2560px]:text-7xl font-black tracking-wider text-white uppercase m-0;
+}
+
+.logo-marquee {
+  @apply w-full overflow-hidden relative;
+  /* Efek gradasi transparan di ujung kiri & kanan biar mulus sampai ujung layar */
+  mask-image: linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%);
+}
+
+/* HP: Marquee | Desktop (>=1024px): Statis & Rata Tengah */
+.marquee-track {
+  @apply flex gap-4 lg:gap-8 min-[2560px]:gap-12 w-max animate-[infiniteScroll_14s_linear_infinite];
+}
+
+.logo-marquee:hover .marquee-track {
+  @apply [animation-play-state:paused];
+}
+
+.marquee-group {
+  @apply flex items-center justify-center gap-4 lg:gap-8 min-[2560px]:gap-12;
+}
+
+.circle-lg {
+  @apply w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 min-[2560px]:w-36 min-[2560px]:h-36 rounded-full bg-[#D9D9D9] shrink-0;
+}
+
+.partners-community-grid {
+  @apply flex flex-wrap justify-center items-start gap-8 md:gap-16 min-[2560px]:gap-24 w-full max-w-4xl min-[2560px]:max-w-6xl mx-auto pt-4;
+}
+
+.partner-column {
+  @apply flex flex-col items-center gap-3 text-center min-w-[200px];
+}
+
+.partner-title {
+  @apply text-white text-center font-['Helvetica'] text-lg md:text-2xl lg:text-3xl min-[2560px]:text-4xl font-bold leading-tight;
+}
+
+.circle-group-sm {
+  @apply flex items-center justify-center gap-2 min-[2560px]:gap-4 flex-wrap w-full;
+}
+
+.circle-sm {
+  @apply w-7 h-7 md:w-9 md:h-9 lg:w-11 lg:h-11 min-[2560px]:w-16 min-[2560px]:h-16 rounded-full bg-[#D9D9D9] shrink-0;
+}
+
+@keyframes infiniteScroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+/* ==========================================
+   SECTION 6 - MEDPART & COMMUNITY (TAILWIND REVISED)
+   ========================================== */
+
+.medpart-community-section {
+  @apply w-full bg-[#F8F140] box-border flex justify-center items-center py-6 md:py-10 lg:py-14 min-[2560px]:py-20 px-4 md:px-8 lg:px-12 min-[2560px]:px-16 gap-3 md:gap-6 lg:gap-8 min-[2560px]:gap-12 shrink-0;
+}
+
+.medpart-col,
+.community-col {
+  @apply flex flex-col items-center justify-center text-center flex-1 w-1/2 max-w-[500px] lg:max-w-[650px] min-[2560px]:max-w-[900px] gap-3 lg:gap-4 min-[2560px]:gap-6;
+}
+
+.medpart-title-box,
+.community-title-box {
+  @apply flex h-7 md:h-10 lg:h-12 min-[2560px]:h-16 py-0.5 px-2 justify-center items-center gap-2.5 w-full bg-[#0ECDF1] box-border rounded;
+}
+
+.medpart-title-img,
+.community-title-img {
+  @apply w-full h-full object-contain;
+}
+
+.medpart-logo-group,
+.community-logo-group {
+  @apply flex flex-wrap justify-center items-center gap-3 min-[2560px]:gap-5 w-full;
+}
+
+.medpart-ellipse,
+.community-ellipse {
+  @apply w-6 h-6 md:w-8 md:h-8 lg:w-10 lg:h-10 min-[2560px]:w-14 min-[2560px]:h-14 rounded-full bg-[#D9D9D9] shrink-0;
+}
