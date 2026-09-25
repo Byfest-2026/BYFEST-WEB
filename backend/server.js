@@ -41,7 +41,7 @@ app.use('/api/venue', venueRoutes);
 app.use('/api/films', filmRoutes);
 
 app.get('/', (req, res) => {
-  res.send('Server BYFEST backend berjalan!');
+  res.json({ message: 'BYFEST Backend is running!' });
 });
 
 // 5. Fungsi Jalankan Aplikasi & Sinkronisasi DB
