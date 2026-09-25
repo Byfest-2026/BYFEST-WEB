@@ -25,7 +25,18 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// 3. Akses Folder Upload Gambar Statis (Bukti Transfer, Poster, Avatar, dll)
+// Middleware koneksi DB untuk lingkungan Serverless Vercel
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (error) {
+    console.error('Database connection error:', error);
+    res.status(500).json({ error: 'Database connection failed' });
+  }
+});
+
+// 3. Akses Folder Upload Gambar Statis
 app.use('/uploads', express.static(path.join(__dirname, 'uploads'), {
   setHeaders: (res) => {
     res.set('Access-Control-Allow-Origin', '*');
@@ -44,21 +55,24 @@ app.get('/', (req, res) => {
   res.json({ message: 'BYFEST Backend is running!' });
 });
 
-// 5. Fungsi Jalankan Aplikasi & Sinkronisasi DB
-const startApp = async () => {
-  try {
-    // Tes DB & Sinkronisasi Tabel
-    await connectDB();
-    await sequelize.sync();
-    console.log('Database & seluruh tabel berhasil disinkronkan!');
+// 5. Ekspor Modul untuk Vercel Serverless Function (WAJIB)
+module.exports = app;
 
-    // Jalankan Server
-    app.listen(PORT, () => {
-      console.log(`Server running on http://localhost:${PORT}`);
-    });
-  } catch (error) {
-    console.error('Gagal menjalankan server:', error.message);
-  }
-};
+// 6. Jalankan app.listen HANYA saat dijalankan di lokal (Bukan Vercel)
+if (process.env.NODE_ENV !== 'production') {
+  const startApp = async () => {
+    try {
+      await connectDB();
+      await sequelize.sync();
+      console.log('Database & seluruh tabel berhasil disinkronkan!');
 
-startApp();
+      app.listen(PORT, () => {
+        console.log(`Server running on http://localhost:${PORT}`);
+      });
+    } catch (error) {
+      console.error('Gagal menjalankan server:', error.message);
+    }
+  };
+
+  startApp();
+}
