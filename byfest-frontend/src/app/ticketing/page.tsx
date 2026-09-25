@@ -30,12 +30,12 @@ function TicketingContent() {
     phoneNumber: "",
     email: "",
   });
-  
+
   // SIMPAN OBJECT FILE UNTUK DIKIRIM VIA FORMDATA
   const [paymentProofFile, setPaymentProofFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState<string>("");
   const [fileError, setFileError] = useState<string>("");
-  
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
@@ -102,7 +102,7 @@ function TicketingContent() {
     formData.email.trim() !== "" &&
     paymentProofFile !== null;
 
-const handleSubmit = async () => {
+  const handleSubmit = async () => {
     if (!isFormValid || isSubmitting) return;
 
     setIsSubmitting(true);
@@ -122,10 +122,13 @@ const handleSubmit = async () => {
       }
 
       // Gunakan URL API Ticketing Checkout
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
-      const res = await fetch(`${baseUrl}/ticketing/checkout`, {
+      // Ubah konstanta API_BASE_URL (baris 21)
+      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+
+      // Di dalam fungsi handleSubmit, pastikan panggilannya seperti ini:
+      const res = await fetch(`${API_BASE_URL}/api/ticketing/checkout`, {
         method: "POST",
-        body: payload, // Kirim sebagai multipart/form-data
+        body: payload,
       });
 
       const data = await res.json();
@@ -173,9 +176,9 @@ const handleSubmit = async () => {
           onFileDrop={handleFileDrop}
         />
 
-        <ConfirmPaymentSection 
-          disabled={!isFormValid || isSubmitting} 
-          onConfirm={handleSubmit} 
+        <ConfirmPaymentSection
+          disabled={!isFormValid || isSubmitting}
+          onConfirm={handleSubmit}
         />
 
         <ScrollToTop />

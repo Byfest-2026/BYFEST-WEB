@@ -7,8 +7,8 @@ import ProgramFilter from "@/byfest/Program/ProgramFilter";
 import ProgramCard from "@/byfest/Program/ProgramCard";
 import FilmCard from "@/byfest/Program/FIlmCard";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
-const BACKEND_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
+const BACKEND_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_BASE_URL = `${BACKEND_BASE_URL}/api`;
 
 // Helper serba guna untuk merapikan URL gambar agar tidak terjadi double /uploads
 function formatImageUrl(path?: string, defaultFallback: string = "/images/poster-sample.jpg"): string {
