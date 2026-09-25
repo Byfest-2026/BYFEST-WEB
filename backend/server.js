@@ -1,12 +1,7 @@
 const express = require('express');
-const dotenv = require('dotenv');
 const path = require('path');
 const cors = require('cors');
 const fs = require('fs');
-dotenv.config();
-
-// Import Database
-const { connectDB } = require('./config/db');
 
 // Inisialisasi Express App
 const app = express();
@@ -17,7 +12,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Handling Folder Uploads secara Aman di Vercel
+// Handling Folder Uploads secara Aman (jika folder ada)
 const uploadsDir = path.join(__dirname, 'uploads');
 if (fs.existsSync(uploadsDir)) {
   app.use('/uploads', express.static(uploadsDir, {
@@ -27,15 +22,15 @@ if (fs.existsSync(uploadsDir)) {
   }));
 }
 
-// Rute Utama (Root Endpoint)
+// Rute Test Utama (Cek Health Server)
 app.get('/', (req, res) => {
   res.status(200).json({ 
     status: 'success',
-    message: 'BYFEST Backend API is running on Vercel!' 
+    message: 'BYFEST Backend API is running successfully on Vercel!' 
   });
 });
 
-// Import Routes API dengan Try-Catch agar Server Tidak Crash Total
+// Import Routes API dengan Try-Catch agar tidak crash saat initialization
 try {
   app.use('/api/home', require('./routes/homeRoutes'));
   app.use('/api/programs', require('./routes/programRoutes'));
@@ -47,16 +42,17 @@ try {
   console.error('Error loading routes:', err.message);
 }
 
-// Ekspor Modul untuk Vercel Serverless Function (WAJIB)
+// Ekspor Modul Express untuk Vercel Serverless Function (WAJIB)
 module.exports = app;
 
-// Jalankan app.listen Hanya di Lokal
-if (process.env.NODE_ENV !== 'production') {
+// Hanya jalankan app.listen di Local Machine
+if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+  const { connectDB } = require('./config/db');
   const startApp = async () => {
     try {
       await connectDB();
       app.listen(PORT, () => {
-        console.log(`Server running on http://localhost:${PORT}`);
+        console.log(`Server running locally on http://localhost:${PORT}`);
       });
     } catch (error) {
       console.error('Gagal menjalankan server lokal:', error.message);
