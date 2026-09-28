@@ -1,6 +1,6 @@
 require('pg'); // Memaksa bundler Vercel mendeteksi library pg
 const express = require('express');
-const cors = require('cors');const express = require('express');
+const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
 const { connectDB } = require('./config/db');
@@ -22,8 +22,6 @@ connectDB().catch((err) => {
 const uploadsDir = path.join(__dirname, 'uploads');
 try {
   if (!fs.existsSync(uploadsDir)) {
-    // Pada lingkungan Vercel, pembuatan direktori lokal /uploads bisa dibatasi.
-    // Membungkusnya dengan try-catch mencegah serverless function crash saat cold start.
     fs.mkdirSync(uploadsDir, { recursive: true });
   }
 } catch (err) {
@@ -53,7 +51,7 @@ app.use('/api/ticketing', require('./routes/ticketingRoutes'));
 app.use('/api/venue', require('./routes/venueRoutes'));
 app.use('/api/films', require('./routes/filmRoutes'));
 
-// 6. Global Error Handler (Pencegah Crash 500 Tanpa Respon)
+// 6. Global Error Handler
 app.use((err, req, res, next) => {
   console.error('Unhandled Server Error:', err);
   res.status(500).json({
