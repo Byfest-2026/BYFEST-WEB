@@ -258,37 +258,58 @@ const getGallery = async (req, res) => {
   }
 };
 
+const GalleryDocumentation = require('../models/GalleryDocumentation'); // Sesuaikan path model kamu
+
 const createGalleryItem = async (req, res) => {
   try {
+    // 1. Ambil title & description dari req.body
     const { title, description } = req.body;
 
-    // Ambil URL Cloudinary dari req.file.path jika file diunggah
-    const media_url = req.file 
-      ? req.file.path 
-      : (req.body.media_url || req.body.image_url || req.body.image);
+    // Validasi judul wajib diisi (karena allowNull: false di model)
+    if (!title) {
+      return res.status(400).json({
+        success: false,
+        message: 'Title wajib diisi'
+      });
+    }
 
+    // 2. Tangkap URL gambar dari req.file (Cloudinary) atau req.body.media_url
+    let media_url = null;
+
+    if (req.file && req.file.path) {
+      media_url = req.file.path;
+    } else if (req.body && (req.body.media_url || req.body.image_url || req.body.media)) {
+      media_url = req.body.media_url || req.body.image_url || req.body.media;
+    }
+
+    // Validasi file/URL gambar wajib diisi (karena allowNull: false di model)
     if (!media_url) {
-      await removeCloudinaryFile(req);
       return res.status(400).json({
         success: false,
         message: 'File gambar atau media_url wajib diisi'
       });
     }
 
-    const newDoc = await GalleryDocumentation.create({
-      title,
-      description,
-      media_url
+    // 3. Simpan ke database menggunakan nama atribut yang sesuai dengan model
+    const newItem = await GalleryDocumentation.create({
+      title: title,
+      description: description || null,
+      media_url: media_url
     });
 
     return res.status(201).json({
       success: true,
-      message: 'Dokumentasi berhasil ditambahkan',
-      data: newDoc
+      message: 'Berhasil menambahkan item galeri',
+      data: newItem
     });
   } catch (error) {
-    await removeCloudinaryFile(req);
-    return res.status(500).json({ success: false, error: error.message });
+    console.error('Error createGalleryItem:', error);
+
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal menambahkan item galeri',
+      error: error.message
+    });
   }
 };
 
