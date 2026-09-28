@@ -258,8 +258,6 @@ const getGallery = async (req, res) => {
   }
 };
 
-const GalleryDocumentation = require('../models/GalleryDocumentation'); // Sesuaikan path model kamu
-
 const createGalleryItem = async (req, res) => {
   try {
     // 1. Ambil title & description dari req.body
