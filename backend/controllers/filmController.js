@@ -1,4 +1,37 @@
 const { Film } = require('../models');
+const cloudinary = require('cloudinary').v2;
+
+// Konfigurasi Cloudinary dari Environment Variables
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+// Helper untuk mengekstrak public_id Cloudinary dari URL poster
+const getPublicIdFromUrl = (url) => {
+  if (!url) return null;
+  try {
+    const parts = url.split('/');
+    const filename = parts.pop().split('.')[0];
+    const folder = parts.pop();
+    return `\({folder}/\){filename}`;
+  } catch (err) {
+    return null;
+  }
+};
+
+// Helper untuk menghapus file dari Cloudinary jika terjadi eror saat pembuatan data
+const removeCloudinaryFile = async (req) => {
+  if (req.file && req.file.path) {
+    const publicId = getPublicIdFromUrl(req.file.path);
+    if (publicId) {
+      await cloudinary.uploader.destroy(publicId).catch((err) => {
+        console.error('Gagal menghapus file rollback Cloudinary:', err.message);
+      });
+    }
+  }
+};
 
 // 1. Ambil Semua Data Film (GET)
 const getAllFilms = async (req, res) => {
@@ -50,7 +83,6 @@ const createFilm = async (req, res) => {
   try {
     const { 
       title, 
-      poster_url, 
       director, 
       dop, 
       genre, 
@@ -60,15 +92,20 @@ const createFilm = async (req, res) => {
     } = req.body;
 
     if (!title) {
+      await removeCloudinaryFile(req);
       return res.status(400).json({
         success: false,
         message: 'Judul film (title) wajib diisi'
       });
     }
 
+    // Jika user mengunggah file poster via Multer Cloudinary, ambil req.file.path.
+    // Jika tidak ada file, tetap dukung input string poster_url dari req.body.
+    const posterUrl = req.file ? req.file.path : req.body.poster_url || null;
+
     const newFilm = await Film.create({
       title,
-      poster_url,
+      poster_url: posterUrl,
       director,
       dop,
       genre,
@@ -83,6 +120,7 @@ const createFilm = async (req, res) => {
       data: newFilm
     });
   } catch (error) {
+    await removeCloudinaryFile(req);
     return res.status(500).json({
       success: false,
       message: 'Gagal menambahkan film',
@@ -102,6 +140,16 @@ const deleteFilm = async (req, res) => {
         success: false,
         message: 'Film tidak ditemukan'
       });
+    }
+
+    // Jika film memiliki poster_url di Cloudinary, hapus filenya dari Cloudinary
+    if (film.poster_url) {
+      const publicId = getPublicIdFromUrl(film.poster_url);
+      if (publicId) {
+        await cloudinary.uploader.destroy(publicId).catch((err) => {
+          console.error('Gagal menghapus poster dari Cloudinary:', err.message);
+        });
+      }
     }
 
     await film.destroy();

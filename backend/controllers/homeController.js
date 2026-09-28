@@ -6,10 +6,45 @@ const {
   MediaPartner,
   Community
 } = require('../models');
-const fs = require('fs');
-const path = require('path');
+const cloudinary = require('cloudinary').v2;
 
-// 1. Ambil Seluruh Data Halaman Home Sekaligus
+// Konfigurasi Cloudinary dari Environment Variables Vercel / .env
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+// Helper untuk mengekstrak public_id Cloudinary dari URL gambar
+const getPublicIdFromUrl = (url) => {
+  if (!url) return null;
+  try {
+    const parts = url.split('/');
+    const filename = parts.pop().split('.')[0];
+    const folder = parts.pop();
+    return `\({folder}/\){filename}`;
+  } catch (err) {
+    return null;
+  }
+};
+
+// Helper untuk menghapus file dari Cloudinary jika transaksi/validasi gagal
+const removeCloudinaryFile = async (req) => {
+  if (req.file && req.file.path) {
+    const publicId = getPublicIdFromUrl(req.file.path);
+    if (publicId) {
+      await cloudinary.uploader.destroy(publicId).catch((err) => {
+        console.error('Gagal menghapus file rollback Cloudinary:', err.message);
+      });
+    }
+  }
+};
+
+// ==========================================
+// 1. HOME & HERO CONTENT
+// ==========================================
+
+// Ambil Seluruh Data Halaman Home Sekaligus
 const getHomeData = async (req, res) => {
   try {
     const [heroContent, trailers, curators, sponsorships, mediaPartners, communities] = await Promise.all([
@@ -42,7 +77,7 @@ const getHomeData = async (req, res) => {
   }
 };
 
-// 2. Ambil Hero/Home Content Sahaja
+// Ambil Hero/Home Content Sahaja
 const getHomeContent = async (req, res) => {
   try {
     const content = await HomeContent.findOne({ order: [['createdAt', 'DESC']] });
@@ -52,10 +87,13 @@ const getHomeContent = async (req, res) => {
   }
 };
 
-// 3. Tambah atau Update Hero/Home Content (Admin)
+// Tambah atau Update Hero/Home Content (Admin)
 const updateHomeContent = async (req, res) => {
   try {
-    const { title, description, hero_image, button_text, button_link } = req.body;
+    const { title, description, button_text, button_link } = req.body;
+
+    // Ambil URL Cloudinary jika mengunggah file hero image
+    const hero_image = req.file ? req.file.path : req.body.hero_image || null;
 
     const newContent = await HomeContent.create({
       title,
@@ -71,11 +109,16 @@ const updateHomeContent = async (req, res) => {
       data: newContent
     });
   } catch (error) {
+    await removeCloudinaryFile(req);
     return res.status(500).json({ success: false, error: error.message });
   }
 };
 
-// 4. Ambil Daftar Kurator
+// ==========================================
+// 2. CURATOR CRUD
+// ==========================================
+
+// Ambil Daftar Kurator
 const getCurators = async (req, res) => {
   try {
     const curators = await Curator.findAll({ order: [['id', 'ASC']] });
@@ -85,14 +128,17 @@ const getCurators = async (req, res) => {
   }
 };
 
-// 5. Tambah Kurator Baru (Admin)
+// Tambah Kurator Baru (Admin)
 const createCurator = async (req, res) => {
   try {
     const name = req.body.name || req.body.nama;
     const bio = req.body.bio || req.body.desc || req.body.description || req.body.role;
-    const photo = req.body.photo_url || req.body.photo || req.body.avatar || req.body.image || req.body.foto;
+    
+    // Ambil URL Cloudinary dari file atau falling back ke body text
+    const photo = req.file ? req.file.path : (req.body.photo_url || req.body.photo || req.body.avatar || req.body.image || req.body.foto);
 
     if (!name) {
+      await removeCloudinaryFile(req);
       return res.status(400).json({ success: false, message: 'Nama kurator wajib diisi' });
     }
 
@@ -108,23 +154,36 @@ const createCurator = async (req, res) => {
       data: newCurator
     });
   } catch (error) {
+    await removeCloudinaryFile(req);
     return res.status(500).json({ success: false, error: error.message });
   }
 };
 
-// 6. Edit Kurator (PUT)
+// Edit Kurator (PUT)
 const updateCurator = async (req, res) => {
   try {
     const { id } = req.params;
     const curator = await Curator.findByPk(id);
 
     if (!curator) {
+      await removeCloudinaryFile(req);
       return res.status(404).json({ success: false, message: 'Kurator tidak ditemukan' });
     }
 
     const name = req.body.name || req.body.nama || curator.name;
     const bio = req.body.bio !== undefined ? req.body.bio : curator.bio;
-    const photo = req.body.photo_url || req.body.photo || req.body.avatar || req.body.image || curator.photo_url;
+    
+    // Jika ada foto baru yang diunggah, hapus foto lama dari Cloudinary
+    let photo = curator.photo_url;
+    if (req.file) {
+      if (curator.photo_url) {
+        const oldPublicId = getPublicIdFromUrl(curator.photo_url);
+        if (oldPublicId) await cloudinary.uploader.destroy(oldPublicId).catch(() => {});
+      }
+      photo = req.file.path;
+    } else if (req.body.photo_url || req.body.photo) {
+      photo = req.body.photo_url || req.body.photo;
+    }
 
     await curator.update({
       name,
@@ -138,11 +197,12 @@ const updateCurator = async (req, res) => {
       data: curator
     });
   } catch (error) {
+    await removeCloudinaryFile(req);
     return res.status(500).json({ success: false, error: error.message });
   }
 };
 
-// 7. Hapus Kurator (Admin)
+// Hapus Kurator (Admin)
 const deleteCurator = async (req, res) => {
   try {
     const { id } = req.params;
@@ -152,10 +212,11 @@ const deleteCurator = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Kurator tidak ditemukan' });
     }
 
+    // Hapus foto dari Cloudinary
     if (curator.photo_url) {
-      const filePath = path.join(__dirname, '..', curator.photo_url);
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
+      const publicId = getPublicIdFromUrl(curator.photo_url);
+      if (publicId) {
+        await cloudinary.uploader.destroy(publicId).catch(() => {});
       }
     }
 
@@ -171,18 +232,30 @@ const deleteCurator = async (req, res) => {
 };
 
 // ==========================================
-// 8. SPONSORSHIP CRUD
+// 3. SPONSORSHIP CRUD
 // ==========================================
+
+const getSponsorships = async (req, res) => {
+  try {
+    const sponsorships = await Sponsorship.findAll({ order: [['id', 'ASC']] });
+    return res.status(200).json({ success: true, data: sponsorships });
+  } catch (error) {
+    return res.status(500).json({ success: false, error: error.message });
+  }
+};
+
 const createSponsorship = async (req, res) => {
   try {
     const name = req.body.name || req.body.nama;
-    const logo_url = req.body.logo_url || req.body.logo || req.body.photo_url || req.body.image;
+    const logo_url = req.file ? req.file.path : (req.body.logo_url || req.body.logo || req.body.photo_url || req.body.image);
 
     if (!name) {
+      await removeCloudinaryFile(req);
       return res.status(400).json({ success: false, message: 'Nama sponsor wajib diisi' });
     }
 
     if (!logo_url) {
+      await removeCloudinaryFile(req);
       return res.status(400).json({ success: false, message: 'Logo sponsor (logo_url) wajib diisi' });
     }
 
@@ -197,6 +270,7 @@ const createSponsorship = async (req, res) => {
       data: newSponsorship
     });
   } catch (error) {
+    await removeCloudinaryFile(req);
     return res.status(500).json({ success: false, error: error.message });
   }
 };
@@ -210,10 +284,11 @@ const deleteSponsorship = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Sponsor tidak ditemukan' });
     }
 
-    if (sponsor.logo) {
-      const filePath = path.join(__dirname, '..', sponsor.logo);
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
+    const logo = sponsor.logo_url || sponsor.logo;
+    if (logo) {
+      const publicId = getPublicIdFromUrl(logo);
+      if (publicId) {
+        await cloudinary.uploader.destroy(publicId).catch(() => {});
       }
     }
 
@@ -223,20 +298,11 @@ const deleteSponsorship = async (req, res) => {
     return res.status(500).json({ success: false, error: error.message });
   }
 };
-// Ambil seluruh daftar Sponsorship
-const getSponsorships = async (req, res) => {
-  try {
-    const sponsorships = await Sponsorship.findAll({ order: [['id', 'ASC']] });
-    return res.status(200).json({ success: true, data: sponsorships });
-  } catch (error) {
-    return res.status(500).json({ success: false, error: error.message });
-  }
-};
 
 // ==========================================
-// 9. MEDIA PARTNER CRUD
+// 4. MEDIA PARTNER CRUD
 // ==========================================
-// Ambil seluruh daftar Media Partner
+
 const getMediaPartners = async (req, res) => {
   try {
     const mediaPartners = await MediaPartner.findAll({ order: [['id', 'ASC']] });
@@ -245,22 +311,19 @@ const getMediaPartners = async (req, res) => {
     return res.status(500).json({ success: false, error: error.message });
   }
 };
+
 const createMediaPartner = async (req, res) => {
   try {
     const name = req.body.name || req.body.nama;
-    
-    // 1. Tambahkan req.body.logo_url di pilihan paling awal
-    //    serta dukung req.file jika mengunggah file via Multer
-    const logo_url = req.file 
-      ? `/uploads/media-partner/${req.file.filename}` 
-      : (req.body.logo_url || req.body.logo || req.body.photo_url || req.body.image);
+    const logo_url = req.file ? req.file.path : (req.body.logo_url || req.body.logo || req.body.photo_url || req.body.image);
 
     if (!name) {
+      await removeCloudinaryFile(req);
       return res.status(400).json({ success: false, message: 'Nama media partner wajib diisi' });
     }
     
-    // 2. Perbaiki pesan error agar sesuai dengan Media Partner
     if (!logo_url) {
+      await removeCloudinaryFile(req);
       return res.status(400).json({ success: false, message: 'Logo media partner (logo_url) wajib diisi' });
     }
 
@@ -275,6 +338,7 @@ const createMediaPartner = async (req, res) => {
       data: newMediaPartner
     });
   } catch (error) {
+    await removeCloudinaryFile(req);
     return res.status(500).json({ success: false, error: error.message });
   }
 };
@@ -288,10 +352,11 @@ const deleteMediaPartner = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Media partner tidak ditemukan' });
     }
 
-    if (mediaPartner.logo) {
-      const filePath = path.join(__dirname, '..', mediaPartner.logo);
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
+    const logo = mediaPartner.logo_url || mediaPartner.logo;
+    if (logo) {
+      const publicId = getPublicIdFromUrl(logo);
+      if (publicId) {
+        await cloudinary.uploader.destroy(publicId).catch(() => {});
       }
     }
 
@@ -303,27 +368,36 @@ const deleteMediaPartner = async (req, res) => {
 };
 
 // ==========================================
-// 10. COMMUNITY CRUD
+// 5. COMMUNITY CRUD
 // ==========================================
+
+const getCommunities = async (req, res) => {
+  try {
+    const communities = await Community.findAll({ order: [['id', 'ASC']] });
+    return res.status(200).json({ success: true, data: communities });
+  } catch (error) {
+    return res.status(500).json({ success: false, error: error.message });
+  }
+};
+
 const createCommunity = async (req, res) => {
   try {
     const name = req.body.name || req.body.nama;
-    // Ambil path gambar dari req.file (jika multer) atau dari req.body
-    const logo_url = req.file 
-      ? `/uploads/comunnity/${req.file.filename}` 
-      : (req.body.logo_url || req.body.logo || req.body.image);
+    const logo_url = req.file ? req.file.path : (req.body.logo_url || req.body.logo || req.body.image);
 
     if (!name) {
+      await removeCloudinaryFile(req);
       return res.status(400).json({ success: false, message: 'Nama community wajib diisi' });
     }
 
     if (!logo_url) {
+      await removeCloudinaryFile(req);
       return res.status(400).json({ success: false, message: 'Logo community (logo_url) wajib diisi' });
     }
 
     const newCommunity = await Community.create({
       name,
-      logo_url // Masukkan ke kolom logo_url
+      logo_url
     });
 
     return res.status(201).json({
@@ -332,6 +406,7 @@ const createCommunity = async (req, res) => {
       data: newCommunity
     });
   } catch (error) {
+    await removeCloudinaryFile(req);
     return res.status(500).json({ success: false, error: error.message });
   }
 };
@@ -345,24 +420,16 @@ const deleteCommunity = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Komunitas tidak ditemukan' });
     }
 
-    if (community.logo) {
-      const filePath = path.join(__dirname, '..', community.logo);
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
+    const logo = community.logo_url || community.logo;
+    if (logo) {
+      const publicId = getPublicIdFromUrl(logo);
+      if (publicId) {
+        await cloudinary.uploader.destroy(publicId).catch(() => {});
       }
     }
 
     await community.destroy();
     return res.status(200).json({ success: true, message: 'Komunitas berhasil dihapus' });
-  } catch (error) {
-    return res.status(500).json({ success: false, error: error.message });
-  }
-};
-// Ambil seluruh daftar Community
-const getCommunities = async (req, res) => {
-  try {
-    const communities = await Community.findAll({ order: [['id', 'ASC']] });
-    return res.status(200).json({ success: true, data: communities });
   } catch (error) {
     return res.status(500).json({ success: false, error: error.message });
   }

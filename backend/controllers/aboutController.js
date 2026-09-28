@@ -6,6 +6,39 @@ const {
   Film, 
   GalleryDocumentation 
 } = require('../models');
+const cloudinary = require('cloudinary').v2;
+
+// Konfigurasi Cloudinary dari Environment Variables
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+// Helper untuk mengekstrak public_id Cloudinary dari URL gambar
+const getPublicIdFromUrl = (url) => {
+  if (!url) return null;
+  try {
+    const parts = url.split('/');
+    const filename = parts.pop().split('.')[0];
+    const folder = parts.pop();
+    return `\({folder}/\){filename}`;
+  } catch (err) {
+    return null;
+  }
+};
+
+// Helper untuk menghapus file dari Cloudinary jika transaksi/validasi gagal
+const removeCloudinaryFile = async (req) => {
+  if (req.file && req.file.path) {
+    const publicId = getPublicIdFromUrl(req.file.path);
+    if (publicId) {
+      await cloudinary.uploader.destroy(publicId).catch((err) => {
+        console.error('Gagal menghapus file rollback Cloudinary:', err.message);
+      });
+    }
+  }
+};
 
 // ==========================================
 // 1. DATA GABUNGAN & ABOUT US
@@ -64,14 +97,16 @@ const getLeads = async (req, res) => {
 const createLead = async (req, res) => {
   try {
     const name = req.body.name || req.body.nama;
-    // Dukung properti division, role, atau jabatan
     const division = req.body.division || req.body.role || req.body.jabatan;
     const faculty = req.body.faculty || req.body.fakultas;
+    
+    // Ambil URL Cloudinary dari req.file.path jika file diunggah
     const photo_url = req.file 
-      ? `/uploads/leads/${req.file.filename}` 
+      ? req.file.path 
       : (req.body.photo_url || req.body.photo || req.body.image);
 
     if (!name || !division) {
+      await removeCloudinaryFile(req);
       return res.status(400).json({ 
         success: false, 
         message: 'Nama dan divisi/jabatan lead wajib diisi' 
@@ -91,6 +126,7 @@ const createLead = async (req, res) => {
       data: newLead
     });
   } catch (error) {
+    await removeCloudinaryFile(req);
     return res.status(500).json({ success: false, error: error.message });
   }
 };
@@ -102,6 +138,14 @@ const deleteLead = async (req, res) => {
 
     if (!lead) {
       return res.status(404).json({ success: false, message: 'Data lead tidak ditemukan' });
+    }
+
+    // Hapus foto dari Cloudinary jika ada
+    if (lead.photo_url) {
+      const publicId = getPublicIdFromUrl(lead.photo_url);
+      if (publicId) {
+        await cloudinary.uploader.destroy(publicId).catch(() => {});
+      }
     }
 
     await lead.destroy();
@@ -141,20 +185,19 @@ const createAwardWinner = async (req, res) => {
   try {
     const { year, category, film, person, instansi } = req.body;
 
-    // Ambil path gambar jika di-upload via Multer, atau dari body JSON
+    // Ambil URL Cloudinary dari req.file.path jika file diunggah
     const image = req.file 
-      ? `/uploads/winners/${req.file.filename}` 
+      ? req.file.path 
       : (req.body.image || req.body.photo || null);
 
-    // Validasi field yang wajib diisi sesuai model baru
     if (!year || !category || !film) {
+      await removeCloudinaryFile(req);
       return res.status(400).json({ 
         success: false, 
         message: 'Field year, category, dan film wajib diisi' 
       });
     }
 
-    // Buat data baru menggunakan field yang ada di model WinnerAward
     const newWinner = await WinnerAward.create({
       year,
       category,
@@ -170,6 +213,7 @@ const createAwardWinner = async (req, res) => {
       data: newWinner
     });
   } catch (error) {
+    await removeCloudinaryFile(req);
     return res.status(500).json({ 
       success: false, 
       error: error.message 
@@ -184,6 +228,14 @@ const deleteAwardWinner = async (req, res) => {
 
     if (!winner) {
       return res.status(404).json({ success: false, message: 'Data pemenang award tidak ditemukan' });
+    }
+
+    // Hapus foto pemenang dari Cloudinary jika ada
+    if (winner.image) {
+      const publicId = getPublicIdFromUrl(winner.image);
+      if (publicId) {
+        await cloudinary.uploader.destroy(publicId).catch(() => {});
+      }
     }
 
     await winner.destroy();
@@ -210,13 +262,13 @@ const createGalleryItem = async (req, res) => {
   try {
     const { title, description } = req.body;
 
-    // Ambil path gambar dari file Multer ATAU dari body (media_url / image_url / image)
+    // Ambil URL Cloudinary dari req.file.path jika file diunggah
     const media_url = req.file 
-      ? `/uploads/gallery/${req.file.filename}` 
+      ? req.file.path 
       : (req.body.media_url || req.body.image_url || req.body.image);
 
-    // Validasi field wajib
     if (!media_url) {
+      await removeCloudinaryFile(req);
       return res.status(400).json({
         success: false,
         message: 'File gambar atau media_url wajib diisi'
@@ -235,9 +287,11 @@ const createGalleryItem = async (req, res) => {
       data: newDoc
     });
   } catch (error) {
+    await removeCloudinaryFile(req);
     return res.status(500).json({ success: false, error: error.message });
   }
 };
+
 const deleteGalleryItem = async (req, res) => {
   try {
     const { id } = req.params;
@@ -245,6 +299,14 @@ const deleteGalleryItem = async (req, res) => {
 
     if (!item) {
       return res.status(404).json({ success: false, message: 'Dokumentasi tidak ditemukan' });
+    }
+
+    // Hapus file media dokumentasi dari Cloudinary
+    if (item.media_url) {
+      const publicId = getPublicIdFromUrl(item.media_url);
+      if (publicId) {
+        await cloudinary.uploader.destroy(publicId).catch(() => {});
+      }
     }
 
     await item.destroy();

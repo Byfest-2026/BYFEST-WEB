@@ -16,7 +16,7 @@ router.get('/', getAllPrograms);
 router.get('/:id', getProgramById);
 
 // POST /api/programs -> Buat program baru
-router.post('/', createProgram);
+router.post('/', upload.single('image'), createProgram);
 
 // POST /api/programs/:id/films -> Hubungkan Film ke Program
 router.post('/:id/films', addFilmToProgram);

@@ -28,23 +28,23 @@ router.post('/content', updateHomeContent);
 
 // Curators
 router.get('/curators', getCurators);
-router.post('/curators', createCurator);
+router.post('/curators',upload.single('photo_url'), createCurator);
 router.put('/curators/:id', updateCurator);
 router.delete('/curators/:id', deleteCurator);
 
 // Sponsorships
 router.get('/sponsorships', getSponsorships);
-router.post('/sponsorships', createSponsorship);
+router.post('/sponsorships', upload.single('logo_url'), createSponsorship);
 router.delete('/sponsorships/:id', deleteSponsorship);
 
 // Media Partners
 router.get('/media-partners', getMediaPartners);
-router.post('/media-partners', createMediaPartner);
+router.post('/media-partners', upload.single('logo_url'), createMediaPartner);
 router.delete('/media-partners/:id', deleteMediaPartner);
 
 // Communities
 router.get('/community', getCommunities);
-router.post('/community', createCommunity);
+router.post('/community', upload.single('logo_url'), createCommunity);
 router.delete('/community/:id', deleteCommunity);
 
 module.exports = router;

@@ -1,4 +1,37 @@
 const { Program, Film, Venue, TicketType } = require('../models');
+const cloudinary = require('cloudinary').v2;
+
+// Konfigurasi Cloudinary dari Environment Variables
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+// Helper untuk mengekstrak public_id Cloudinary dari URL gambar
+const getPublicIdFromUrl = (url) => {
+  if (!url) return null;
+  try {
+    const parts = url.split('/');
+    const filename = parts.pop().split('.')[0];
+    const folder = parts.pop();
+    return `\({folder}/\){filename}`;
+  } catch (err) {
+    return null;
+  }
+};
+
+// Helper untuk menghapus file dari Cloudinary jika transaksi/validasi gagal
+const removeCloudinaryFile = async (req) => {
+  if (req.file && req.file.path) {
+    const publicId = getPublicIdFromUrl(req.file.path);
+    if (publicId) {
+      await cloudinary.uploader.destroy(publicId).catch((err) => {
+        console.error('Gagal menghapus file rollback Cloudinary:', err.message);
+      });
+    }
+  }
+};
 
 // 1. Ambil Seluruh Program Beserta Daftar Film, Venue, & Tiket
 const getAllPrograms = async (req, res) => {
@@ -141,7 +174,7 @@ const addFilmToProgram = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: `Film "${film.title}" berhasil ditambahkan ke Program "${program.name}"`
+      message: `Film "\({film.title}" berhasil ditambahkan ke Program "\){program.name}"`
     });
   } catch (error) {
     return res.status(500).json({
@@ -152,14 +185,12 @@ const addFilmToProgram = async (req, res) => {
   }
 };
 
-// 4. Buat Program Baru
-// Buat Program Baru
+// 4. Buat Program Baru (Dukungan Cloudinary Upload)
 const createProgram = async (req, res) => {
   try {
     const {
       name,
       title,
-      image,
       description,
       synopsis,
       date,
@@ -173,11 +204,15 @@ const createProgram = async (req, res) => {
     const programName = name || title;
 
     if (!programName) {
+      await removeCloudinaryFile(req);
       return res.status(400).json({
         success: false,
         message: 'Nama program (name) wajib diisi'
       });
     }
+
+    // Ambil URL Cloudinary dari req.file.path jika file diunggah
+    const imageUrl = req.file ? req.file.path : (req.body.image || null);
 
     // Generator slug otomatis dari nama program
     const generatedSlug = programName
@@ -190,13 +225,13 @@ const createProgram = async (req, res) => {
     const newProgram = await Program.create({
       name: programName,
       slug: generatedSlug,
-      image: image || null,
+      image: imageUrl,
       description: description || synopsis,
       date,
       start_time,
       end_time,
-      age_rating: age_rating || null, // Diambil dinamis dari input request
-      quota: quota,                   // Menggunakan quota langsung sesuai input JSON
+      age_rating: age_rating || null,
+      quota: quota,
       venue_id
     });
 
@@ -206,6 +241,7 @@ const createProgram = async (req, res) => {
       data: newProgram
     });
   } catch (error) {
+    await removeCloudinaryFile(req);
     return res.status(500).json({
       success: false,
       message: 'Gagal membuat program',
@@ -214,6 +250,7 @@ const createProgram = async (req, res) => {
   }
 };
 
+// 5. Hapus Program (Hapus File di Cloudinary)
 const deleteProgram = async (req, res) => {
   try {
     const { id } = req.params;
@@ -221,6 +258,14 @@ const deleteProgram = async (req, res) => {
 
     if (!program) {
       return res.status(404).json({ success: false, message: 'Program tidak ditemukan' });
+    }
+
+    // Hapus file gambar dari Cloudinary jika ada
+    if (program.image) {
+      const publicId = getPublicIdFromUrl(program.image);
+      if (publicId) {
+        await cloudinary.uploader.destroy(publicId).catch(() => {});
+      }
     }
 
     await program.destroy();

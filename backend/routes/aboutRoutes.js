@@ -50,7 +50,7 @@ router.get('/content', getAboutContent);
 router.get('/leads', getLeads);
 
 // POST /api/about/leads (Mendukung upload file 'photo' atau 'photo_url')
-router.post('/leads', upload.single('photo'), createLead);
+router.post('/leads', upload.single('photo_url'), createLead);
 
 // DELETE /api/about/leads/:id
 router.delete('/leads/:id', deleteLead);
@@ -59,7 +59,7 @@ router.delete('/leads/:id', deleteLead);
 router.get('/awards', getAwards);
 
 // POST /api/about/awards
-router.post('/awards', createAwardWinner);
+router.post('/awards', upload.single('image'), createAwardWinner);
 
 // DELETE /api/about/awards/:id
 router.delete('/awards/:id', deleteAwardWinner);
@@ -68,7 +68,7 @@ router.delete('/awards/:id', deleteAwardWinner);
 router.get('/gallery', getGallery);
 
 // POST /api/about/gallery (Mendukung upload file 'image' atau 'image_url')
-router.post('/gallery', upload.single('image'), createGalleryItem);
+router.post('/gallery', upload.single('media_url'), createGalleryItem);
 
 // DELETE /api/about/gallery/:id
 router.delete('/gallery/:id', deleteGalleryItem);
