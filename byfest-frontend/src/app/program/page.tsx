@@ -131,7 +131,7 @@ export default function AllProgramPage() {
               </div>
             ) : (
 
-            /* CONDITION 2: DETAIL PROGRAM & FILM CARDS */
+              /* CONDITION 2: DETAIL PROGRAM & FILM CARDS */
               selectedProgram ? (
                 <div className="detail-section">
 
@@ -141,9 +141,13 @@ export default function AllProgramPage() {
                       title={selectedProgram.name || selectedProgram.title || ""}
                       description={selectedProgram.description || selectedProgram.desc || ""}
                       date={selectedProgram.date || ""}
-                      time={selectedProgram.start_time ? `${selectedProgram.start_time} - ${selectedProgram.end_time}` : (selectedProgram.time || "")}
-                      location={selectedProgram.location || "BYFEST Venue"}
-                      ageRating={selectedProgram.ageRating || selectedProgram.age_rating || "13+"}
+                      time={
+                        selectedProgram.start_time
+                          ? `${selectedProgram.start_time} - ${selectedProgram.end_time || ""}`
+                          : selectedProgram.time || ""
+                      }
+                      location={selectedProgram.location || ""}
+                      ageRating={selectedProgram.ageRating || selectedProgram.age_rating || ""}
                       totalFilms={filmList.length}
                       runtime={selectedProgram.runtime || "-"}
                       image={formatImageUrl(selectedProgram.image, "/images/poster-sample.jpg")}
