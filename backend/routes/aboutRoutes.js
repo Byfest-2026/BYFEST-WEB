@@ -39,9 +39,6 @@ const storage = multer.diskStorage({
     cb(null, uniqueSuffix + path.extname(file.originalname));
   }
 });
-
-const upload = multer({ storage });
-
 // GET /api/about (Ambil seluruh data About Us sekaligus untuk frontend)
 router.get('/', getAboutData);
 
