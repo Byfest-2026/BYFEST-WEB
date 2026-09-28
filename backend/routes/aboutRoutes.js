@@ -3,6 +3,8 @@ const router = express.Router();
 const multer = require('multer');
 const path = require('path');
 
+const upload = require('../middleware/upload');
+
 // Import controller
 const {
   getAboutData,
