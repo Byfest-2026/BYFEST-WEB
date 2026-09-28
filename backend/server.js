@@ -1,10 +1,8 @@
 require('pg'); // Memaksa bundler Vercel mendeteksi library pg
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
-const fs = require('fs');
 
-// Impor connectDB dari db.js
+// Impor connectDB dari config/db.js
 const { connectDB } = require('./config/db');
 
 const app = express();
@@ -20,24 +18,7 @@ connectDB().catch((err) => {
   console.error('Database connection error during startup:', err.message);
 });
 
-// 3. Penanganan Folder Uploads Secara Aman di Vercel (Read-Only Filesystem)
-const uploadsDir = path.join(__dirname, 'uploads');
-try {
-  if (!fs.existsSync(uploadsDir)) {
-    fs.mkdirSync(uploadsDir, { recursive: true });
-  }
-} catch (err) {
-  console.warn('Sistem file lokal bersifat read-only (Vercel Runtime environment).');
-}
-
-// Melayani file statis folder uploads
-app.use('/uploads', express.static(uploadsDir, {
-  setHeaders: (res) => {
-    res.set('Access-Control-Allow-Origin', '*');
-  }
-}));
-
-// 4. Rute Test Utama (Health Check)
+// 3. Rute Test Utama (Health Check)
 app.get('/', (req, res) => {
   res.status(200).json({ 
     status: 'success',
@@ -45,7 +26,7 @@ app.get('/', (req, res) => {
   });
 });
 
-// 5. Import dan Registrasi Routes
+// 4. Import dan Registrasi Routes
 app.use('/api/home', require('./routes/homeRoutes'));
 app.use('/api/programs', require('./routes/programRoutes'));
 app.use('/api/about', require('./routes/aboutRoutes'));
@@ -53,7 +34,7 @@ app.use('/api/ticketing', require('./routes/ticketingRoutes'));
 app.use('/api/venue', require('./routes/venueRoutes'));
 app.use('/api/films', require('./routes/filmRoutes'));
 
-// 6. Global Error Handler
+// 5. Global Error Handler
 app.use((err, req, res, next) => {
   console.error('Unhandled Server Error:', err);
   res.status(500).json({
@@ -62,12 +43,12 @@ app.use((err, req, res, next) => {
   });
 });
 
-// 7. Jalankan app.listen Hanya di Lingkungan Lokal
+// 6. Jalankan app.listen Hanya di Lingkungan Lokal
 if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
   app.listen(PORT, () => {
     console.log(`Server running locally on http://localhost:${PORT}`);
   });
 }
 
-// 8. Ekspor Modul Express untuk Vercel Serverless Function
+// 7. Ekspor Modul Express untuk Vercel Serverless Function
 module.exports = app;

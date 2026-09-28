@@ -2,22 +2,20 @@ const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const multer = require('multer');
 
-// Konfigurasi kredensial Cloudinary dari .env / Vercel Environment Variables
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Storage khusus bukti transfer pembayaran
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: 'byfest_bukti_tf', // Folder penyimpanan bukti TF di Cloudinary
-    allowed_formats: ['jpg', 'png', 'jpeg', 'webp', 'pdf'],
+    folder: 'byfest_uploads', // Folder otomatis di Cloudinary
+    allowed_formats: ['jpg', 'png', 'jpeg', 'webp'],
   },
 });
 
-const uploadPayment = multer({ storage: storage });
+const upload = multer({ storage: storage });
 
-module.exports = uploadPayment;
+module.exports = upload;
