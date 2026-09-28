@@ -1,6 +1,7 @@
+require('pg'); // Memaksa bundler Vercel mendeteksi library pg
 const express = require('express');
+const cors = require('cors');const express = require('express');
 const path = require('path');
-const cors = require('cors');
 const fs = require('fs');
 const { connectDB } = require('./config/db');
 

@@ -1,13 +1,5 @@
 {
   "version": 2,
-  "functions": {
-    "api/**/*.js": {
-      "includeFiles": "node_modules/pg/**"
-    },
-    "server.js": {
-      "includeFiles": "node_modules/pg/**"
-    }
-  },
   "rewrites": [
     {
       "source": "/(.*)",

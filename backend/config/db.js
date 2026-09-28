@@ -1,17 +1,18 @@
 const { Sequelize } = require('sequelize');
+const pg = require('pg'); // Memaksa Vercel mengenali modul pg saat bundling
 require('dotenv').config();
 
-// Prioritaskan Connection String (Neon/Vercel), gunakan fallback variabel terpisah jika tidak ada
 const connectionString = process.env.POSTGRES_URL || process.env.DATABASE_URL;
 
 const sequelize = connectionString
   ? new Sequelize(connectionString, {
       dialect: 'postgres',
+      dialectModule: pg, // Sangat penting untuk Vercel Serverless!
       logging: false,
       dialectOptions: {
         ssl: {
           require: true,
-          rejectUnauthorized: false // Wajib untuk Neon PostgreSQL
+          rejectUnauthorized: false
         }
       },
       pool: {
@@ -29,6 +30,7 @@ const sequelize = connectionString
         host: process.env.DB_HOST || process.env.PGHOST,
         port: process.env.DB_PORT || 5432,
         dialect: 'postgres',
+        dialectModule: pg, // Sangat penting untuk Vercel Serverless!
         logging: false,
         dialectOptions: {
           ssl: {
