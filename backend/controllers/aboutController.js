@@ -8,7 +8,7 @@ const {
 } = require('../models');
 const cloudinary = require('cloudinary').v2;
 
-// Konfigurasi Cloudinary dari Environment Variables
+// Konfigurasi Cloudinary dari Environment Variables Vercel
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -22,7 +22,7 @@ const getPublicIdFromUrl = (url) => {
     const parts = url.split('/');
     const filename = parts.pop().split('.')[0];
     const folder = parts.pop();
-    return `\({folder}/\){filename}`;
+    return `\({folder}/\){filename}`; // ⚠️ Sudah diperbaiki menggunakan ${}
   } catch (err) {
     return null;
   }
