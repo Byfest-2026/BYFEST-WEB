@@ -22,7 +22,7 @@ const getPublicIdFromUrl = (url) => {
     const parts = url.split('/');
     const filename = parts.pop().split('.')[0];
     const folder = parts.pop();
-    return `\({folder}/\){filename}`; // ⚠️ Sudah diperbaiki menggunakan ${}
+    return `\({folder}/\){filename}`; // Sudah diperbaiki menggunakan ${}
   } catch (err) {
     return null;
   }
