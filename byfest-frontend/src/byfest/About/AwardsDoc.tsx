@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
-const UPLOADS_BASE_URL = process.env.NEXT_PUBLIC_ASSETS_URL || "http://localhost:5000/uploads";
+const UPLOADS_BASE_URL = process.env.NEXT_PUBLIC_ASSET_URL || "http://localhost:5000/uploads";
 
 interface WinnerItem {
     id: number | string;
@@ -33,11 +33,11 @@ export default function AwardsDoc() {
             try {
                 const res = await fetch(`${API_BASE_URL}/about`, {
                     signal: controller.signal
-                }); 
-                
+                });
+
                 if (res.ok) {
                     const result = await res.json();
-                    
+
                     const winnersData = result.data?.winners || [];
                     setWinners(winnersData);
 
@@ -62,10 +62,12 @@ export default function AwardsDoc() {
 
     const getImageUrl = (imagePath?: string) => {
         if (!imagePath) return null;
-        if (imagePath.startsWith('http')) return imagePath;
+        if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+            return imagePath;
+        }
 
         const cleanPath = imagePath.startsWith('/') ? imagePath.slice(1) : imagePath;
-        
+
         if (cleanPath.startsWith('uploads/')) {
             const hostUrl = UPLOADS_BASE_URL.replace(/\/uploads\/?$/, '');
             return `${hostUrl}/${cleanPath}`;
@@ -105,12 +107,12 @@ export default function AwardsDoc() {
                                 <article key={winner.id || index} className="byfest-winner-card">
                                     <div className="byfest-winner-img relative overflow-hidden bg-[#D9D9D9]">
                                         {imageUrl ? (
-                                            <Image 
-                                                src={imageUrl} 
-                                                alt={winner.film || 'Poster Film'} 
+                                            <Image
+                                                src={imageUrl}
+                                                alt={winner.film || 'Poster Film'}
                                                 fill
                                                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                                                className="object-cover" 
+                                                className="object-cover"
                                                 unoptimized={process.env.NODE_ENV === 'development'}
                                             />
                                         ) : (
@@ -143,50 +145,50 @@ export default function AwardsDoc() {
 
                 <div className="byfest-awards-divider" aria-hidden="true" />
 
-{/* BAGIAN 2: DOKUMENTASI GALERI (3 Baris Vertikal, Tanpa Stroke/Border) */}
-<article className="byfest-doc-card w-full">
-    <h3 className="byfest-doc-heading font-bold text-lg mb-4">
-        BYFEST Documentation
-    </h3>
+                {/* BAGIAN 2: DOKUMENTASI GALERI (3 Baris Vertikal, Tanpa Stroke/Border) */}
+                <article className="byfest-doc-card w-full">
+                    <h3 className="byfest-doc-heading font-bold text-lg mb-4">
+                        BYFEST Documentation
+                    </h3>
 
-    {/* Container tanpa border/stroke */}
-    <div className="w-full flex flex-col gap-3">
-        {loading ? (
-            <p className="text-gray-400 text-sm py-8 text-center">Memuat galeri...</p>
-        ) : gallery.length === 0 ? (
-            <p className="text-gray-400 text-sm py-8 text-center">Belum ada dokumentasi galeri.</p>
-        ) : (
-            gallery.slice(0, 3).map((docItem, index) => {
-                const docImageUrl = getImageUrl(docItem.media_url);
+                    {/* Container tanpa border/stroke */}
+                    <div className="w-full flex flex-col gap-3">
+                        {loading ? (
+                            <p className="text-gray-400 text-sm py-8 text-center">Memuat galeri...</p>
+                        ) : gallery.length === 0 ? (
+                            <p className="text-gray-400 text-sm py-8 text-center">Belum ada dokumentasi galeri.</p>
+                        ) : (
+                            gallery.slice(0, 3).map((docItem, index) => {
+                                const docImageUrl = getImageUrl(docItem.media_url);
 
-                return (
-                    <div 
-                        key={docItem.id || index} 
-                        /* px-3 memberikan jarak sedikit di sebelah kiri dan kanan */
-                        className="w-full px-3"
-                    >
-                        <div className="relative w-full h-36 md:h-44 overflow-hidden rounded-lg bg-gray-200">
-                            {docImageUrl ? (
-                                <Image 
-                                    src={docImageUrl} 
-                                    alt="Dokumentasi BYFEST" 
-                                    fill
-                                    sizes="(max-width: 768px) 100vw, 50vw"
-                                    className="object-cover"
-                                    unoptimized={process.env.NODE_ENV === 'development'}
-                                />
-                            ) : (
-                                <div className="h-full w-full flex items-center justify-center text-xs text-gray-500">
-                                    No Image
-                                </div>
-                            )}
-                        </div>
+                                return (
+                                    <div
+                                        key={docItem.id || index}
+                                        /* px-3 memberikan jarak sedikit di sebelah kiri dan kanan */
+                                        className="w-full px-3"
+                                    >
+                                        <div className="relative w-full h-36 md:h-44 overflow-hidden rounded-lg bg-gray-200">
+                                            {docImageUrl ? (
+                                                <Image
+                                                    src={docImageUrl}
+                                                    alt="Dokumentasi BYFEST"
+                                                    fill
+                                                    sizes="(max-width: 768px) 100vw, 50vw"
+                                                    className="object-cover"
+                                                    unoptimized={process.env.NODE_ENV === 'development'}
+                                                />
+                                            ) : (
+                                                <div className="h-full w-full flex items-center justify-center text-xs text-gray-500">
+                                                    No Image
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                );
+                            })
+                        )}
                     </div>
-                );
-            })
-        )}
-    </div>
-</article>
+                </article>
             </div>
         </section>
     );
