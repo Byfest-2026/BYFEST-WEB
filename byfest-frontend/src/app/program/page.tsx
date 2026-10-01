@@ -114,8 +114,8 @@ export default function AllProgramPage() {
                       description={prog.description || prog.desc || ""}
                       date={prog.date || ""}
                       time={prog.start_time ? `${prog.start_time} - ${prog.end_time}` : (prog.time || "")}
-                      location={prog.location || "BYFEST Venue"}
-                      ageRating={prog.ageRating || prog.age_rating || "13+"}
+                      location={prog.location || "Movie Room FIB A"}
+                      ageRating={prog.age_rating || prog.ageRating || ""}
                       totalFilms={
                         currentFilms.length > 0
                           ? `${currentFilms.length} Films`
