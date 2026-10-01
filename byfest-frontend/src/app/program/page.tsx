@@ -46,23 +46,34 @@ export default function AllProgramPage() {
     fetchBackendPrograms();
   }, []);
 
-  // PERBAIKAN LOGIKA: Set default ke null agar tidak selalu kembali ke programs[0]
+  // PERBAIKAN LOGIKA: Penentuan selectedProgram yang toleran terhadap Nama, ID, dan Indeks
   let selectedProgram: any = null;
 
-  if (activeFilter.startsWith("Program ")) {
-    const index = parseInt(activeFilter.replace("Program ", ""), 10) - 1;
-    if (programs[index]) {
-      selectedProgram = programs[index];
-    } else {
-      // Jika tidak ada di index, coba cari berdasarkan ID
-      const foundById = programs.find((p) => p.id === parseInt(activeFilter.replace("Program ", ""), 10));
-      if (foundById) selectedProgram = foundById;
-    }
-  } else if (programs.length > 0) {
-    // Jika filter adalah "All Programs", default ambil yang pertama
-    selectedProgram = programs[0];
-  }
+  if (activeFilter === "All Programs") {
+    // Saat "All Programs", selectedProgram harus null agar menampilkan semua card program
+    selectedProgram = null;
+  } else if (activeFilter.startsWith("Program ")) {
+    const rawValue = activeFilter.replace("Program ", "").trim();
+    const targetNumber = parseInt(rawValue, 10);
 
+    // 1. Cari berdasarkan ID asli dari database terlebih dahulu (diubah ke String agar aman)
+    const foundById = programs.find((p) => String(p.id) === String(rawValue));
+
+    if (foundById) {
+      selectedProgram = foundById;
+    } else if (!isNaN(targetNumber)) {
+      // 2. Jika ID tidak cocok, baru gunakan indeks array (1-based)
+      const index = targetNumber - 1;
+      if (programs[index]) {
+        selectedProgram = programs[index];
+      }
+    }
+  } else {
+    // 3. Jika nilai activeFilter adalah Nama Program langsung (misal: "Main Competition")
+    selectedProgram = programs.find(
+      (p) => (p.name || p.title || "").toLowerCase() === activeFilter.toLowerCase()
+    ) || null;
+  }
   // Ambil daftar film (Mendukung alias 'films' huruf kecil maupun 'Films' huruf besar)
   const filmList = selectedProgram?.films || selectedProgram?.Films || [];
 
