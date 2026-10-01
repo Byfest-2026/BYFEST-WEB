@@ -6,6 +6,7 @@ import Footer from "@/byfest/Footer/Footer";
 import ProgramFilter from "@/byfest/Program/ProgramFilter";
 import ProgramCard from "@/byfest/Program/ProgramCard";
 import FilmCard from "@/byfest/Program/FIlmCard";
+import { useSearchParams } from 'next/navigation';
 
 const BACKEND_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 const API_BASE_URL = `${BACKEND_BASE_URL}/api`;
@@ -22,6 +23,8 @@ function formatImageUrl(path?: string, defaultFallback: string = "/images/poster
 }
 
 export default function AllProgramPage() {
+  const searchParams = useSearchParams();
+  const programQuery = searchParams.get('program');
   const [activeFilter, setActiveFilter] = useState("All Programs");
   const [programs, setPrograms] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -45,23 +48,38 @@ export default function AllProgramPage() {
 
     fetchBackendPrograms();
   }, []);
-
+  useEffect(() => {
+    if (programQuery) {
+      if (!isNaN(Number(programQuery))) {
+        setActiveFilter(`Program ${programQuery}`);
+      } else {
+        setActiveFilter(programQuery);
+      }
+    }
+  }, [programQuery]);
+  
   // PERBAIKAN LOGIKA: Set default ke null agar tidak selalu kembali ke programs[0]
   let selectedProgram: any = null;
 
-  if (activeFilter.startsWith("Program ")) {
-    const index = parseInt(activeFilter.replace("Program ", ""), 10) - 1;
+ if (activeFilter.startsWith("Program ")) {
+  const rawValue = activeFilter.replace("Program ", "").trim();
+  const targetNumber = parseInt(rawValue, 10);
+
+  // 1. Prioritas Utama: Cari berdasarkan ID asli database (Pakai String agar aman beda tipe data)
+  const foundById = programs.find((p) => String(p.id) === String(rawValue));
+
+  if (foundById) {
+    selectedProgram = foundById;
+  } else if (!isNaN(targetNumber)) {
+    // 2. Prioritas Kedua: Cari berdasarkan indeks array 1-based jika ID tidak ditemukan
+    const index = targetNumber - 1;
     if (programs[index]) {
       selectedProgram = programs[index];
-    } else {
-      // Jika tidak ada di index, coba cari berdasarkan ID
-      const foundById = programs.find((p) => p.id === parseInt(activeFilter.replace("Program ", ""), 10));
-      if (foundById) selectedProgram = foundById;
     }
-  } else if (programs.length > 0) {
-    // Jika filter adalah "All Programs", default ambil yang pertama
-    selectedProgram = programs[0];
   }
+} else if (programs.length > 0) {
+  selectedProgram = programs[0];
+}
 
   // Ambil daftar film (Mendukung alias 'films' huruf kecil maupun 'Films' huruf besar)
   const filmList = selectedProgram?.films || selectedProgram?.Films || [];
@@ -124,7 +142,7 @@ export default function AllProgramPage() {
                       runtime={prog.runtime || "-"}
                       image={formatImageUrl(prog.image, "/images/poster-sample.jpg")}
                       isDetail={false}
-                      onViewDetail={() => setActiveFilter(`Program ${index + 1}`)}
+                      onViewDetail={() => setActiveFilter(`Program ${prog.id || index + 1}`)}
                     />
                   );
                 })}
@@ -146,7 +164,7 @@ export default function AllProgramPage() {
                           ? `${selectedProgram.start_time} - ${selectedProgram.end_time || ""}`
                           : selectedProgram.time || ""
                       }
-                      location={"Movie Room FIB A, Universitas Brawijaya"}
+                      location={"Movie Room FIB A"}
                       ageRating={selectedProgram.ageRating || selectedProgram.age_rating || ""}
                       totalFilms={filmList.length}
                       runtime={selectedProgram.runtime || "-"}
