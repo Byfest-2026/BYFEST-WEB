@@ -7,10 +7,8 @@ import ProgramFilter from "@/byfest/Program/ProgramFilter";
 import ProgramCard from "@/byfest/Program/ProgramCard";
 import FilmCard from "@/byfest/Program/FIlmCard";
 
-const RAW_URL = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000").replace(/\/$/, "");
-const API_BASE_URL = RAW_URL.endsWith("/api") ? RAW_URL : `${RAW_URL}/api`;
-const BACKEND_BASE_URL = RAW_URL.replace(/\/api$/, "");
-
+const BACKEND_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_BASE_URL = `${BACKEND_BASE_URL}/api`;
 
 // Helper serba guna untuk merapikan URL gambar agar tidak terjadi double /uploads
 function formatImageUrl(path?: string, defaultFallback: string = "/images/poster-sample.jpg"): string {
@@ -47,33 +45,35 @@ export default function AllProgramPage() {
 
     fetchBackendPrograms();
   }, []);
+  
 
+  // PERBAIKAN LOGIKA: Penentuan selectedProgram yang toleran terhadap Nama, ID, dan Indeks
+  let selectedProgram: any = null;
 
-// 2. Logika Pencarian selectedProgram yang Kebal Mismatch Tipe Data
-let selectedProgram: any = null;
+  if (activeFilter === "All Programs") {
+    // Saat "All Programs", selectedProgram harus null agar menampilkan semua card program
+    selectedProgram = null;
+  } else if (activeFilter.startsWith("Program ")) {
+    const rawValue = activeFilter.replace("Program ", "").trim();
+    const targetNumber = parseInt(rawValue, 10);
 
-if (activeFilter === "All Programs") {
-  selectedProgram = null;
-} else {
-  // Ambil ID murni (misal "Program 6" -> "6", atau "6" -> "6")
-  const targetId = activeFilter.replace("Program ", "").trim();
+    // 1. Cari berdasarkan ID asli dari database terlebih dahulu (diubah ke String agar aman)
+    const foundById = programs.find((p) => String(p.id) === String(rawValue));
 
-  // Cari berdasarkan ID (konversi keduanya ke String agar tidak gagal jika backend mengirim Number)
-  selectedProgram = programs.find((p) => String(p.id) === String(targetId));
-
-  // Jika tidak ditemukan lewat ID, coba cari berdasarkan nama program (misal "Program 1")
-  if (!selectedProgram) {
+    if (foundById) {
+      selectedProgram = foundById;
+    } else if (!isNaN(targetNumber)) {
+      // 2. Jika ID tidak cocok, baru gunakan indeks array (1-based)
+      const index = targetNumber - 1;
+      if (programs[index]) {
+        selectedProgram = programs[index];
+      }
+    }
+  } else {
+    // 3. Jika nilai activeFilter adalah Nama Program langsung (misal: "Main Competition")
     selectedProgram = programs.find(
       (p) => (p.name || p.title || "").toLowerCase() === activeFilter.toLowerCase()
-    );
-  }
-
-  // Jika tetap tidak ditemukan, baru fallback ke indeks array jika activeFilter berupa angka
-  if (!selectedProgram && !isNaN(Number(targetId))) {
-    const index = Number(targetId) - 1;
-    if (programs[index]) {
-      selectedProgram = programs[index];
-    }
+    ) || null;
   }
   // Ambil daftar film (Mendukung alias 'films' huruf kecil maupun 'Films' huruf besar)
   const filmList = selectedProgram?.films || selectedProgram?.Films || [];
@@ -220,5 +220,4 @@ if (activeFilter === "All Programs") {
       <Footer />
     </main>
   );
-}
 }
