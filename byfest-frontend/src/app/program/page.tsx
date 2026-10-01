@@ -114,7 +114,7 @@ export default function AllProgramPage() {
                       description={prog.description || prog.desc || ""}
                       date={prog.date || ""}
                       time={prog.start_time ? `${prog.start_time} - ${prog.end_time}` : (prog.time || "")}
-                      location={"Movie Room FIB A"}
+                      location={"Movie Room FIB A, Universitas Brawijaya"}
                       ageRating={prog.age_rating || prog.ageRating || ""}
                       totalFilms={
                         currentFilms.length > 0
@@ -146,7 +146,7 @@ export default function AllProgramPage() {
                           ? `${selectedProgram.start_time} - ${selectedProgram.end_time || ""}`
                           : selectedProgram.time || ""
                       }
-                      location={"Movie Room FIB A"}
+                      location={"Movie Room FIB A, Universitas Brawijaya"}
                       ageRating={selectedProgram.ageRating || selectedProgram.age_rating || ""}
                       totalFilms={filmList.length}
                       runtime={selectedProgram.runtime || "-"}
