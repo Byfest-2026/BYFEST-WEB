@@ -114,7 +114,7 @@ export default function AllProgramPage() {
                       description={prog.description || prog.desc || ""}
                       date={prog.date || ""}
                       time={prog.start_time ? `${prog.start_time} - ${prog.end_time}` : (prog.time || "")}
-                      location={prog.location || "Movie Room FIB A"}
+                      location={"Movie Room FIB A"}
                       ageRating={prog.age_rating || prog.ageRating || ""}
                       totalFilms={
                         currentFilms.length > 0
@@ -177,7 +177,7 @@ export default function AllProgramPage() {
                               dop={film.dop || "-"}
                               time={film.start_time || film.time || "13:00"}
                               genre={film.genre || "Fiksi"}
-                              age={film.age_rating || film.age || "13+"}
+                              age={film.age_rating || film.age || "-"}
                               duration={film.duration ? `${film.duration} Min` : "-"}
                               description={film.synopsis || film.description}
                               posterImage={formatImageUrl(posterPath, "/images/poster-sample.jpg")}
