@@ -17,12 +17,12 @@ export interface TicketOption {
 // dan OrderSummarySection (buat format angka).
 export const TICKETS: TicketOption[] = [
   { id: "all-day", name: "All Day Pass", price: 120000 },
-  { id: "2", name: "Program 1", price: 35000 },
-  { id: "3", name: "Program 2", price: 35000 },
-  { id: "4", name: "Program 3", price: 0 },
-  { id: "prog-4", name: "Program 4", price: 35000 },
-  { id: "prog-5", name: "Program 5", price: 35000 },
-  { id: "prog-6", name: "Program 6", price: 35000 },
+  { id: "6", name: "Program 1", price: 35000 },
+  { id: "7", name: "Program 2", price: 35000 },
+  { id: "9", name: "Program 3", price: 35000 },
+  { id: "10", name: "Program 4", price: 35000 },
+  { id: "11", name: "Program 5", price: 35000 },
+  { id: "prog-6", name: "Program 6", price: 0 },
 ];
 
 export const formatRupiah = (amount: number) =>
