@@ -104,8 +104,8 @@ export default function Home() {
                     description={prog.description || prog.desc || ""}
                     date={prog.date || ""}
                     time={prog.start_time ? `${prog.start_time} - ${prog.end_time}` : (prog.time || "")}
-                    location={prog.location || "BYFEST Venue"}
-                    ageRating={prog.age_rating || prog.ageRating || "13+"}
+                    location={"Movie Room FIB A, Universitas Brawijaya"}
+                    ageRating={prog.age_rating || prog.ageRating}
                     totalFilms={currentFilms.length > 0 ? currentFilms.length : (prog.totalFilms || "-")}
                     runtime={prog.runtime || "-"}
                     image={formatImageUrl(prog.image, "/images/poster-sample.jpg")}
