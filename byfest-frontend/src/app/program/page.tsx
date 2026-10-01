@@ -146,7 +146,7 @@ export default function AllProgramPage() {
                           ? `${selectedProgram.start_time} - ${selectedProgram.end_time || ""}`
                           : selectedProgram.time || ""
                       }
-                      location={selectedProgram.location || "Movie Room FIB A"}
+                      location={"Movie Room FIB A"}
                       ageRating={selectedProgram.ageRating || selectedProgram.age_rating || ""}
                       totalFilms={filmList.length}
                       runtime={selectedProgram.runtime || "-"}
