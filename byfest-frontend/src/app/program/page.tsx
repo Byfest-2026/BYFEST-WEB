@@ -125,7 +125,7 @@ export default function AllProgramPage() {
                       title={prog.name || prog.title || ""}
                       description={prog.description || prog.desc || ""}
                       date={prog.date || ""}
-                      time={prog.start_time ? `\({prog.start_time} -\){prog.end_time} || ""}` : (prog.time || "")}
+                      time={prog.start_time ? `${prog.start_time} - ${prog.end_time}` : (prog.time || "")}
                       location={"Movie Room FIB A, Universitas Brawijaya"}
                       ageRating={prog.age_rating || prog.ageRating || ""}
                       totalFilms={
