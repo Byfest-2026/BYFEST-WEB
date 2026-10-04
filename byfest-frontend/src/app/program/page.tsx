@@ -155,7 +155,7 @@ export default function AllProgramPage() {
                       date={selectedProgram.date || ""}
                       time={
                         selectedProgram.start_time
-                          ? `\({selectedProgram.start_time} -\){selectedProgram.end_time || ""}`
+                          ? `${selectedProgram.start_time} - ${selectedProgram.end_time || ""}`
                           : selectedProgram.time || ""
                       }
                       location={"Movie Room FIB A"}
