@@ -186,9 +186,12 @@ export default function AllProgramPage() {
                               key={film.id}
                               title={film.title}
                               director={film.director}
-                              dop={film.dop || "-"}
-                              time={film.start_time || film.time || "13:00"}
-                              genre={film.genre || "Fiksi"}
+                             time={
+                                film.start_time
+                                  ? `${film.start_time} - ${film.end_time || ""}`
+                                  : film.time || ""
+                              }
+                              genre={film.genre || ""}
                               age={film.age_rating || film.age || "-"}
                               duration={film.duration ? `${film.duration} Min` : "-"}
                               description={film.synopsis || film.description}
