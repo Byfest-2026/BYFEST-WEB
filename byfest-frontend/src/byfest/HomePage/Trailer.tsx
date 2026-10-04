@@ -29,7 +29,7 @@ export default function Trailer({
         {/* Gunung Kiri (172px x 268px) */}
         <div className="trailer-mountain-left">
           <Image 
-            src="/images/vector 2.svg" 
+            src="/images/Vector 2.svg" 
             alt="Mountain Left" 
             fill 
             className="trailer-img-fill" 
