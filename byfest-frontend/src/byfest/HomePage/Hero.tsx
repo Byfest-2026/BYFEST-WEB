@@ -1,4 +1,9 @@
-  import Image from "next/image";
+ "use client";
+import { useRouter } from "next/navigation";
+
+const router = useRouter();
+import Image from "next/image";
+
 
 
   export default function Hero() {
@@ -53,9 +58,9 @@
           </div>
 
           {/* 4. Button Reserve Ticket */}
-          <a href="/ticketing" className="hero-btn-reserve">
+          <button type="button" className="hero-btn-reserve" onClick={() => router.push("/ticketing")}>
             Reserve your ticket now
-          </a>
+          </button>
 
         </div>
 
