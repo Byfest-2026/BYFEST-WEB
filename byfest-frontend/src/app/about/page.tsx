@@ -2,7 +2,6 @@ import "@/byfest/About/about.css";
 import Hero from "@/byfest/About/Hero";
 import Navbar from "@/byfest/Navbar/Navbar";
 import Footer from "@/byfest/Footer/Footer";
-import AfterMovie from "@/byfest/About/AfterMovie";
 import Vision from "@/byfest/About/Vision";
 import Leads from "@/byfest/About/Leads";
 import AwardsDoc from "@/byfest/About/AwardsDoc";
