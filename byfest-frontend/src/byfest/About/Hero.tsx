@@ -1,3 +1,6 @@
+import React from "react";
+import Link from "next/link";
+
 export default function Hero() {
     return (
         <section className="byfest-hero">
@@ -22,36 +25,41 @@ export default function Hero() {
                     sebuah manifestasi perubahan.
                 </p>
 
-                <button type="button" className="byfest-hero-btn">
+                <Link href="/program" className="byfest-hero-btn">
                     <span className="byfest-hero-btn-text">Look Our Programs</span>
-                </button>
+                </Link>
             </div>
 
             <div className="byfest-hero-divider" aria-hidden="true" />
 
             <article className="byfest-hero-right">
-                <div className="byfest-hero-aftermovie-placeholder">
-                    <div className="byfest-hero-aftermovie-video">
+                <section className="byfest-aftermovie-card">
+                    <div className="byfest-aftermovie-video">
                         <iframe
-                            className="h-full w-full"
-                            src="https://www.youtube.com/embed/YOUR_VIDEO_ID"
+                            className="h-full w-full rounded-[7px]"
+                            style={{
+                                transform: "scale(1.15)",
+                                transformOrigin: "center"
+                            }}
+                            src="https://www.instagram.com/reel/DQdZtMdEZgw/embed"
                             title="After Movie Byfest 2025"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+                            scrolling="no"
+                            frameBorder="0"
                             loading="lazy"
                             allowFullScreen
                         />
                     </div>
 
-                    <div className="byfest-hero-aftermovie-heading">
-                        <span>After Movie</span>
-                        <strong>Byfest 2025</strong>
-                    </div>
-                </div>
+                    <h2 className="byfest-aftermovie-title">
+                        After Movie <strong>BYFEST 2025</strong>
+                    </h2>
+                </section>
 
                 <div className="byfest-hero-aftermovie-content">
                     <h2 className="byfest-hero-theme-title">Theme</h2>
                     <p className="byfest-hero-theme-desc">
-                        
+                        {/* Deskripsi tema */}
                     </p>
                 </div>
             </article>
