@@ -19,8 +19,14 @@ import ScrollToTop from "@/byfest/ScrollToTop/ScrollToTop";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_FILE_TYPES = ["image/jpeg", "image/jpg", "image/png", "application/pdf"];
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
-const BACKEND_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
+
+// Base URL backend (tanpa "/api" dan tanpa "/" di akhir).
+// Prioritas: env variable Vercel, cadangan: URL backend produksi.
+const API_BASE_URL = (
+  process.env.NEXT_PUBLIC_API_URL || "https://byfest-backend.vercel.app"
+)
+  .replace(/\/+$/, "") // buang "/" di akhir
+  .replace(/\/api$/, ""); // buang "/api" kalau terlanjur ada
 
 function TicketingContent() {
   const searchParams = useSearchParams();
@@ -122,17 +128,19 @@ function TicketingContent() {
         payload.append("payment_proof", paymentProofFile);
       }
 
-      // Gunakan URL API Ticketing Checkout
-      // Ubah konstanta API_BASE_URL (baris 21)
-      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-
-      // Di dalam fungsi handleSubmit, pastikan panggilannya seperti ini:
       const res = await fetch(`${API_BASE_URL}/api/ticketing/checkout`, {
         method: "POST",
         body: payload,
       });
 
-      const data = await res.json();
+      // Backend bisa membalas non-JSON (misalnya halaman error Vercel),
+      // jadi parse dengan aman supaya pesan error-nya jelas.
+      let data: { success?: boolean; message?: string } = {};
+      try {
+        data = await res.json();
+      } catch {
+        data = { message: `Server membalas status ${res.status} (bukan JSON).` };
+      }
 
       if (res.ok && data.success) {
         setShowModal(true); // Tampilkan ConfirmationModal.tsx
@@ -140,7 +148,7 @@ function TicketingContent() {
         alert(`Gagal memesan tiket: ${data.message || "Terjadi kesalahan"}`);
       }
     } catch (err) {
-      console.error("Gagal mengirim pesanan:", err);
+      console.error("Gagal mengirim pesanan:", err, "URL:", API_BASE_URL);
       alert("Gagal terhubung ke server.");
     } finally {
       setIsSubmitting(false);
