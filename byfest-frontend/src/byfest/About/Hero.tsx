@@ -1,8 +1,14 @@
+"use client";
+
 import React from "react";
 
-const REEL_EMBED_URL = "https://www.instagram.com/reel/DaP45KKPP6Q/embed";
+interface HeroProps {
+  instagramEmbedUrl?: string;
+}
 
-export default function HeroSection() {
+export default function HeroSection({
+  instagramEmbedUrl = "https://www.instagram.com/reel/DaP45KKPP6Q/embed",
+}: HeroProps) {
   return (
     <section className="bf-hero">
       <div className="bf-hero-text">
@@ -24,15 +30,19 @@ export default function HeroSection() {
         </button>
       </div>
 
-      {/* Video langsung rasio 16:9, tanpa pembungkus kartu */}
+      {/* Video 16:9, pola sama dengan komponen Trailer di homepage */}
       <div className="bf-hero-video">
-        <iframe
-          src={REEL_EMBED_URL}
-          title="After Movie BYFEST 2025"
-          allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-          allowFullScreen
-          scrolling="no"
-        />
+        {instagramEmbedUrl && (
+          <iframe
+            src={instagramEmbedUrl}
+            title="BYFEST 2026 Instagram Reel"
+            className="bf-hero-iframe"
+            allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+            allowFullScreen
+            scrolling="no"
+            frameBorder="0"
+          />
+        )}
       </div>
     </section>
   );
