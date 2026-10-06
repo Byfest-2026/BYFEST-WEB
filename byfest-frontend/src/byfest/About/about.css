@@ -16,9 +16,7 @@
 
 /* =========================================================
    HERO (CSS biasa, kelas bf-hero-*)
-   Tinggi video: ubah --bf-video-h
-   Crop header/footer Instagram: ubah top & height di
-   ".bf-hero-video iframe" (header ~ -64px, footer ~ +190px total)
+   Tinggi kotak video (header IG + video): ubah --bf-video-h
    ========================================================= */
 .bf-hero {
   --bf-video-h: 560px;
@@ -134,23 +132,20 @@
   font-weight: 600;
 }
 
-/* Kotak video: iframe dibuat lebih besar lalu dipotong (overflow hidden)
-   supaya hanya videonya yang terlihat */
+/* Embed Instagram ditampilkan utuh (header + video), tanpa crop */
 .bf-hero-video {
   position: relative;
   width: 100%;
   height: var(--bf-video-h);
   overflow: hidden;
-  border-radius: 12px;
+  border-radius: 16px;
   background: #000;
 }
 
 .bf-hero-video iframe {
-  position: absolute;
-  top: -64px;
-  left: 0;
+  display: block;
   width: 100%;
-  height: calc(100% + 190px);
+  height: 100%;
   border: 0;
 }
 
@@ -331,7 +326,7 @@
 
   /* Hero */
   .bf-hero {
-    --bf-video-h: 600px;
+    --bf-video-h: 620px;
     display: grid;
     grid-template-columns: minmax(0, 1fr) 400px;
     align-items: center;
