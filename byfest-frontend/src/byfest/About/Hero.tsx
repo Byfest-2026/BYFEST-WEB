@@ -24,27 +24,16 @@ export default function HeroSection() {
         </button>
       </div>
 
-      {/* Satu kartu untuk mobile & desktop */}
-      <aside className="bf-hero-media">
-        <p className="bf-hero-media-label">
-          After Movie <strong>BYFEST 2025</strong>
-        </p>
-
-        <div className="bf-hero-video">
-          <iframe
-            src={REEL_EMBED_URL}
-            title="After Movie BYFEST 2025"
-            allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-            allowFullScreen
-            scrolling="no"
-          />
-        </div>
-
-        <div className="bf-hero-theme">
-          <h2>Theme</h2>
-          <p>Deskripsi tema film festival...</p>
-        </div>
-      </aside>
+      {/* Video langsung rasio 16:9, tanpa pembungkus kartu */}
+      <div className="bf-hero-video">
+        <iframe
+          src={REEL_EMBED_URL}
+          title="After Movie BYFEST 2025"
+          allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+          allowFullScreen
+          scrolling="no"
+        />
+      </div>
     </section>
   );
 }
