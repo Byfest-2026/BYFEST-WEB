@@ -51,7 +51,7 @@ export default function Hero() {
                 <div className="byfest-hero-aftermovie-content">
                     <h2 className="byfest-hero-theme-title">Theme</h2>
                     <p className="byfest-hero-theme-desc">
-                        DESCRIPTIONNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
+                        
                     </p>
                 </div>
             </article>
