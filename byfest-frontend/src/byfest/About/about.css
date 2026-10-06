@@ -16,25 +16,25 @@
 
 /* =========================================================
    HERO (CSS biasa, kelas bf-hero-*)
-   Rasio video: ubah --bf-video-ratio (contoh: 16 / 9, 4 / 3)
+   Crop header/footer Instagram: ubah --bf-crop-top & --bf-crop-bottom
+   di ".bf-hero-device" (tambah angka kalau header/footer masih terlihat)
    ========================================================= */
 .bf-hero {
-  --bf-video-ratio: 16 / 9;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 32px;
+  gap: 40px;
   width: 100%;
   max-width: 1440px;
   margin-inline: auto;
-  padding: 80px 24px 32px;
+  padding: 80px 24px 40px;
 }
 
 .bf-hero-text {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 12px;
+  gap: 14px;
   width: 100%;
 }
 
@@ -60,24 +60,20 @@
 }
 
 .bf-hero-title {
-  max-width: 260px;
   font-family: var(--font-anton);
-  font-size: 48px;
+  font-size: clamp(48px, 14vw, 72px);
   font-weight: 400;
   line-height: 1;
   color: #fff;
   -webkit-text-stroke: 1px #000;
 }
 
-.bf-hero-br {
-  display: none;
-}
-
 .bf-hero-desc {
   width: 100%;
+  max-width: 520px;
   font-family: var(--font-helvetica);
-  font-size: 13px;
-  line-height: 1.4;
+  font-size: 14px;
+  line-height: 1.5;
   color: #fff;
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
 }
@@ -86,8 +82,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 233px;
-  height: 40px;
+  width: 100%;
+  max-width: 320px;
+  height: 44px;
   padding: 10px 16px;
   border-radius: 50px;
   background: linear-gradient(180deg, #f8f140 0%, #f9099a 100%);
@@ -106,24 +103,39 @@
   transform: scale(0.98);
 }
 
-/* Video: langsung rasio 16:9, tanpa kartu pembungkus.
-   Embed Instagram tampil utuh (header + video + tombol play di tengah) */
-.bf-hero-video {
-  position: relative;
-  width: 100%;
+/* Pembungkus device (potret 9:16), di mobile berada di tengah */
+.bf-hero-device {
+  --bf-crop-top: 56px;
+  --bf-crop-bottom: 90px;
+  align-self: center;
+  width: min(100%, 300px);
   aspect-ratio: 9 / 16;
-  overflow: hidden;
-  border-radius: 20px;
-  background: #000;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  padding: 10px;
+  border-radius: 36px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: #0b0f14;
+  box-shadow:
+    0 0 15px rgba(255, 255, 255, 0.45),
+    0 12px 32px rgba(0, 0, 0, 0.35);
 }
 
-.bf-hero-video iframe {
-  position: absolute;
-  inset: 0;
-  display: block;
+/* Layar: iframe dibuat lebih besar lalu dipotong supaya hanya video yang terlihat */
+.bf-hero-screen {
+  position: relative;
   width: 100%;
   height: 100%;
+  overflow: hidden;
+  border-radius: 26px;
+  background: #000;
+}
+
+.bf-hero-screen iframe {
+  position: absolute;
+  top: calc(var(--bf-crop-top) * -1);
+  left: 0;
+  display: block;
+  width: 100%;
+  height: calc(100% + var(--bf-crop-top) + var(--bf-crop-bottom));
   border: 0;
 }
 
@@ -287,10 +299,10 @@
     );
   }
 
-  /* Hero: teks kiri, video 16:9 kanan */
+  /* Hero: teks kiri, device kanan */
   .bf-hero {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) clamp(360px, 40vw, 560px);
+    grid-template-columns: minmax(0, 1fr) clamp(260px, 26vw, 340px);
     align-items: center;
     gap: clamp(40px, 5vw, 80px);
     min-height: 760px;
@@ -307,27 +319,25 @@
   }
 
   .bf-hero-title {
-    max-width: none;
     font-size: clamp(72px, 8.4vw, 121px);
     -webkit-text-stroke: 2.5px #000;
-  }
-
-  .bf-hero-br {
-    display: block;
   }
 
   .bf-hero-desc {
     max-width: 600px;
     font-size: clamp(18px, 1.7vw, 24px);
-    line-height: 1.5;
   }
 
   .bf-hero-btn {
-    width: 100%;
     max-width: 480px;
     height: 48px;
     font-size: 28px;
     letter-spacing: 0.96px;
+  }
+
+  .bf-hero-device {
+    width: 100%;
+    justify-self: center;
   }
 
   /* Section lain */
