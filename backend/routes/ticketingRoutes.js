@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const uploadPayment = require('../middleware/upload');
+const { uploadPayment } = require('../middleware/upload');
 const { 
   createOrder, 
   getAllOrders, 
