@@ -1,11 +1,15 @@
 const express = require('express');
 const router = express.Router();
+
+// PENTING: pakai destructuring supaya yang terambil adalah storage bukti bayar
+// (folder byfest_bukti_tf, mendukung PDF), bukan storage umum.
 const { uploadPayment } = require('../middleware/upload');
-const { 
-  createOrder, 
-  getAllOrders, 
-  getOrderById, 
-  deleteOrder 
+
+const {
+  createOrder,
+  getAllOrders,
+  getOrderById,
+  deleteOrder,
 } = require('../controllers/ticketingController');
 
 // ==========================================
