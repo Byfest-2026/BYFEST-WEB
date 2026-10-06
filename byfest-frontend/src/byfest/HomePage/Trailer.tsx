@@ -1,69 +1,78 @@
 "use client";
+import "./Homepage.css";
+import React from "react";
+import Image from "next/image";
 
-import React, { useEffect, useRef } from "react";
+interface TrailerProps {
+  instagramEmbedUrl?: string;
+}
 
-// Taruh file di folder /public/videos/ project Anda
-const VIDEO_SRC = "/videos/aftermovie-byfest-2025.mp4";
-const VIDEO_POSTER = "/videos/aftermovie-byfest-2025.jpg"; // opsional, hapus kalau tidak ada
-
-export default function HeroSection() {
-  const videoRef = useRef<HTMLVideoElement>(null);
-
-  // React kadang tidak menulis atribut `muted` dengan benar, padahal browser
-  // hanya mengizinkan autoplay kalau video muted. Dipaksa lewat ref.
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-    video.muted = true;
-    video.play().catch(() => {
-      /* autoplay diblokir (mis. mode hemat daya), video tetap bisa di-tap */
-    });
-  }, []);
-
+export default function Trailer({ 
+  instagramEmbedUrl = "https://www.instagram.com/reel/DQdZtMdEZgw/embed" 
+}: TrailerProps) {
   return (
-    <section className="bf-hero">
-      <div className="bf-hero-text">
-        <div className="bf-hero-badge">7 Years of Byfest Journey</div>
-
-        <h1 className="bf-hero-title">
-          BRAWIJAYA <br className="bf-hero-br" />
-          FILM <br className="bf-hero-br" />
-          FESTIVAL
-        </h1>
-
-        <p className="bf-hero-desc">
-          Brawijaya Film Festival adalah perwujudan kolektif dari semangat sineas
-          muda untuk...
-        </p>
-
-        <button type="button" className="bf-hero-btn">
-          Get Tickets
-        </button>
+    <section className="trailer-section" id="trailer">
+      {/* Background Grid */}
+      <div className="trailer-grid-wrapper">
+        <Image
+          src="/images/Vector-Trailer.svg"
+          alt="Grid Pattern"
+          fill
+          className="trailer-img-cover opacity-90"
+          priority
+        />
       </div>
 
-      <aside className="bf-hero-media">
-        <p className="bf-hero-media-label">
-          After Movie <strong>BYFEST 2025</strong>
-        </p>
-
-        <div className="bf-hero-video">
-          <video
-            ref={videoRef}
-            src={VIDEO_SRC}
-            poster={VIDEO_POSTER}
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="metadata"
+      {/* Canvas Proposional 402x328 */}
+      <div className="trailer-canvas">
+        {/* Gunung Kiri (172px x 268px) */}
+        <div className="trailer-mountain-left">
+          <Image 
+            src="/images/Vector 2.svg" 
+            alt="Mountain Left" 
+            fill 
+            className="trailer-img-fill" 
           />
         </div>
 
-        <div className="bf-hero-theme">
-          <h2>Theme</h2>
-          <p>Deskripsi tema film festival...</p>
+        {/* Gunung Kanan (172px x 268px) */}
+        <div className="trailer-mountain-right">
+          <Image 
+            src="/images/Vector 1.svg" 
+            alt="Mountain Right" 
+            fill 
+            className="trailer-img-fill" 
+          />
         </div>
-      </aside>
+
+        {/* Title BYFEST 2026 */}
+        <div className="trailer-title-wrapper">
+          <Image
+            src="/images/Tittle-Trailer.svg"
+            alt="BYFEST 2026 Official Trailer"
+            fill
+            className="trailer-img-contain"
+            priority
+          />
+        </div>
+
+        {/* Frame Video Player */}
+        <div className="trailer-video-outer">
+          <div className="trailer-video-box">
+            {instagramEmbedUrl && (
+              <iframe
+                src={instagramEmbedUrl}
+                title="BYFEST 2026 Instagram Reel"
+                className="trailer-iframe"
+                allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+                allowFullScreen
+                scrolling="no"
+                frameBorder="0"
+              />
+            )}
+          </div>
+        </div>
+      </div>
     </section>
   );
 }
