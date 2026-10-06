@@ -111,7 +111,7 @@
 .bf-hero-video {
   position: relative;
   width: 100%;
-  aspect-ratio: var(--bf-video-ratio);
+  aspect-ratio: 9 / 16;
   overflow: hidden;
   border-radius: 20px;
   background: #000;
