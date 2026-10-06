@@ -8,7 +8,7 @@ interface TrailerProps {
 }
 
 export default function Trailer({ 
-  instagramEmbedUrl = "instagram.com/reels/DQdZtMdEZgw/embed" 
+  instagramEmbedUrl = "https://www.instagram.com/reel/DQdZtMdEZgw/embed" 
 }: TrailerProps) {
   return (
     <section className="trailer-section" id="trailer">
