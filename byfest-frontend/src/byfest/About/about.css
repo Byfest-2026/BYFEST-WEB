@@ -16,10 +16,10 @@
 
 /* =========================================================
    HERO (CSS biasa, kelas bf-hero-*)
-   Tinggi kotak video (header IG + video): ubah --bf-video-h
+   Rasio video: ubah --bf-video-ratio (contoh: 16 / 9, 4 / 3)
    ========================================================= */
 .bf-hero {
-  --bf-video-h: 560px;
+  --bf-video-ratio: 16 / 9;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -106,62 +106,25 @@
   transform: scale(0.98);
 }
 
-/* Kartu video + tema */
-.bf-hero-media {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  width: 100%;
-  max-width: 400px;
-  padding: 16px;
-  border-radius: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  background: rgba(9, 14, 20, 0.75);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-  font-family: var(--font-inter);
-  color: #fff;
-}
-
-.bf-hero-media-label {
-  font-size: 13px;
-  line-height: 1.2;
-}
-
-.bf-hero-media-label strong {
-  font-weight: 600;
-}
-
-/* Embed Instagram ditampilkan utuh (header + video), tanpa crop */
+/* Video: langsung rasio 16:9, tanpa kartu pembungkus.
+   Embed Instagram tampil utuh (header + video + tombol play di tengah) */
 .bf-hero-video {
   position: relative;
   width: 100%;
-  height: var(--bf-video-h);
+  aspect-ratio: var(--bf-video-ratio);
   overflow: hidden;
-  border-radius: 16px;
+  border-radius: 20px;
   background: #000;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
 }
 
 .bf-hero-video iframe {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
   height: 100%;
   border: 0;
-}
-
-.bf-hero-theme h2 {
-  margin-bottom: 6px;
-  font-size: 24px;
-  font-weight: 700;
-  line-height: 1.2;
-  color: #fff;
-}
-
-.bf-hero-theme p {
-  font-size: 14px;
-  line-height: 1.5;
-  color: rgba(255, 255, 255, 0.9);
-  overflow-wrap: anywhere;
 }
 
 /* Shared section heading */
@@ -324,11 +287,10 @@
     );
   }
 
-  /* Hero */
+  /* Hero: teks kiri, video 16:9 kanan */
   .bf-hero {
-    --bf-video-h: 620px;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 400px;
+    grid-template-columns: minmax(0, 1fr) clamp(360px, 40vw, 560px);
     align-items: center;
     gap: clamp(40px, 5vw, 80px);
     min-height: 760px;
@@ -366,10 +328,6 @@
     height: 48px;
     font-size: 28px;
     letter-spacing: 0.96px;
-  }
-
-  .bf-hero-media {
-    max-width: none;
   }
 
   /* Section lain */
