@@ -13,8 +13,6 @@ export interface TicketOption {
 }
 
 // Sumber data tunggal untuk semua tiket + harganya.
-// ID tiket program = ID program di database (contoh: "7").
-// ID "all-day" adalah tiket pass (tidak memotong kuota program di backend).
 // Diimpor juga oleh page.tsx (buat hitung total & pre-select dari query param)
 // dan OrderSummarySection (buat format angka).
 export const TICKETS: TicketOption[] = [
@@ -24,6 +22,7 @@ export const TICKETS: TicketOption[] = [
   { id: "9", name: "Program 3", price: 35000 },
   { id: "10", name: "Program 4", price: 35000 },
   { id: "11", name: "Program 5", price: 35000 },
+  { id: "prog-6", name: "Program 6", price: 0 },
 ];
 
 export const formatRupiah = (amount: number) =>
@@ -37,7 +36,7 @@ export const formatRupiah = (amount: number) =>
     .trim();
 
 interface TicketTypesSectionProps {
-  /** qty per ticket id, contoh: { "all-day": 1, "7": 2 } */
+  /** qty per ticket id, contoh: { "all-day": 1, "prog-2": 2 } */
   quantities: Record<string, number>;
   onQtyChange: (id: string, qty: number) => void;
 }
