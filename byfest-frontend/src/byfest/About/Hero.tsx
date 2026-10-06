@@ -30,8 +30,6 @@ export default function Hero() {
                 </Link>
             </div>
 
-            <div className="byfest-hero-divider" aria-hidden="true" />
-
             <article className="byfest-hero-right">
                 <section className="byfest-aftermovie-card">
                     <div className="byfest-aftermovie-video">
