@@ -1,5 +1,6 @@
 "use client";
-
+import { useRouter } from "next/navigation";
+const router = useRouter();
 import React from "react";
 
 interface HeroProps {
@@ -25,9 +26,9 @@ export default function HeroSection({
           muda untuk...
         </p>
 
-        <button type="button" className="bf-hero-btn">
-          Get Tickets
-        </button>
+       <button type="button" className="bf-hero-btn" onClick={() => router.push("/program")}>
+  Look Our Program
+</button>
       </div>
 
       {/* Pembungkus device (rasio potret). Header & footer Instagram dipotong,
