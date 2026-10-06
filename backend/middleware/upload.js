@@ -1,61 +1,36 @@
-const path = require('path');
-const multer = require('multer');
+const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
-const cloudinary = require('../config/cloudinary');
+const multer = require('multer');
 
-// Batas body Vercel Serverless ~4.5MB, jadi file dibatasi 4MB
-const MAX_FILE_SIZE = 4 * 1024 * 1024;
-
-// Filter tipe file di sisi multer (sebelum file dikirim ke Cloudinary)
-const makeFileFilter = (mimes, exts, message) => (req, file, cb) => {
-  const ext = path.extname(file.originalname || '').toLowerCase();
-  if (mimes.includes(file.mimetype) && exts.includes(ext)) {
-    return cb(null, true);
-  }
-  const err = new Error(message);
-  err.status = 400; // ditangkap error handler di server.js -> balasan 400
-  return cb(err);
-};
+// Konfigurasi kredensial Cloudinary dari Environment Variables
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 // 1. Storage Umum (Gallery, Leads, Posters, Awards)
 const generalStorage = new CloudinaryStorage({
-  cloudinary,
+  cloudinary: cloudinary,
   params: {
-    folder: 'byfest_media',
+    folder: 'byfest_media', // Folder umum di Cloudinary
     allowed_formats: ['jpg', 'png', 'jpeg', 'webp'],
   },
 });
 
 // 2. Storage Khusus Bukti Transfer Pembayaran
 const paymentStorage = new CloudinaryStorage({
-  cloudinary,
+  cloudinary: cloudinary,
   params: {
     folder: 'byfest_bukti_tf',
     allowed_formats: ['jpg', 'png', 'jpeg', 'webp', 'pdf'],
-    resource_type: 'auto', // gambar & PDF sama-sama bisa
   },
 });
 
-const upload = multer({
-  storage: generalStorage,
-  limits: { fileSize: MAX_FILE_SIZE, files: 1 },
-  fileFilter: makeFileFilter(
-    ['image/jpeg', 'image/png', 'image/webp'],
-    ['.jpg', '.jpeg', '.png', '.webp'],
-    'Format file harus JPG, PNG, atau WebP.'
-  ),
-});
+// Instance Multer
+const upload = multer({ storage: generalStorage });
+const uploadPayment = multer({ storage: paymentStorage });
 
-const uploadPayment = multer({
-  storage: paymentStorage,
-  limits: { fileSize: MAX_FILE_SIZE, files: 1 },
-  fileFilter: makeFileFilter(
-    ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'],
-    ['.jpg', '.jpeg', '.png', '.webp', '.pdf'],
-    'Format file harus JPG, PNG, WebP, atau PDF.'
-  ),
-});
-
-// Bentuk ekspor tetap sama seperti sebelumnya (route lain tidak perlu diubah)
+// Eksport default sebagai 'upload' dan eksport opsional 'uploadPayment'
 module.exports = upload;
 module.exports.uploadPayment = uploadPayment;
