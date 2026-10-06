@@ -1,5 +1,7 @@
 import React from "react";
 
+const REEL_URL = "https://www.instagram.com/reel/ISI_SHORTCODE_REEL/embed"; // ganti dengan shortcode asli
+
 export default function HeroSection() {
   return (
     <section className="byfest-hero">
@@ -20,7 +22,7 @@ export default function HeroSection() {
         </button>
       </div>
 
-      {/* Sisi kanan khusus desktop (divider sudah dihapus) */}
+      {/* Desktop */}
       <div className="byfest-hero-right">
         <div className="byfest-hero-aftermovie-placeholder">
           <div className="byfest-hero-aftermovie-heading">
@@ -29,8 +31,12 @@ export default function HeroSection() {
           </div>
           <div className="byfest-hero-aftermovie-video">
             <iframe
-              src="https://www.instagram.com/reel/EXAMPLE/embed"
+              src={REEL_URL}
               title="After Movie BYFEST"
+              loading="lazy"
+              scrolling="no"
+              allow="encrypted-media; fullscreen"
+              allowFullScreen
             />
           </div>
         </div>
@@ -40,16 +46,20 @@ export default function HeroSection() {
         </div>
       </div>
 
-      {/* Kartu khusus versi mobile */}
-      <div className="byfest-aftermovie-card block lg:hidden">
+      {/* Mobile */}
+      <div className="byfest-aftermovie-card">
         <div className="byfest-aftermovie-title">
           <span>brawijayafilm... </span>
           <strong>Original audio</strong>
         </div>
         <div className="byfest-aftermovie-video">
           <iframe
-            src="https://www.instagram.com/reel/EXAMPLE/embed"
+            src={REEL_URL}
             title="After Movie BYFEST Mobile"
+            loading="lazy"
+            scrolling="no"
+            allow="encrypted-media; fullscreen"
+            allowFullScreen
           />
         </div>
       </div>
