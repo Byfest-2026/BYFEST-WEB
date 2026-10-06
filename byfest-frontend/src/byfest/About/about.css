@@ -71,11 +71,20 @@
 }
 
 .byfest-aftermovie-video {
-  @apply flex min-h-0 w-full flex-1 items-center justify-center overflow-hidden rounded-[7px] bg-[#D9D9D9];
+    position: relative;
+    width: 100%;
+    /* Sesuaikan tinggi sesuai kebutuhan desain Anda */
+    height: 350px; 
+    overflow: hidden;
+    border-radius: 12px;
 }
 
 .byfest-aftermovie-video iframe {
-  border: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+    /* Opsional: Trik untuk membesarkan sedikit iframe agar header/footer bawaan instagram tidak terlihat */
+    transform: scale(1.02); 
 }
 
 /* Shared section heading */
