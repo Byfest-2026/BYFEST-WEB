@@ -156,7 +156,7 @@ function TicketingContent() {
         payload.append("payment_proof", paymentProofFile);
       }
 
-      const res = await fetch(`${API_BASE_URL}/api/ticketing/checkout`, {
+      const res = await fetch(`${API_BASE_URL}/ticketing/checkout`, {
         method: "POST",
         body: payload,
         signal: controller.signal,

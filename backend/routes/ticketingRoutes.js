@@ -13,7 +13,7 @@ const {
 } = require('../controllers/ticketingController');
 
 // ==========================================
-// 1. ROUTE USER (POST /api/ticketing/checkout)
+// 1. ROUTE USER (POST /ticketing/checkout)
 // ==========================================
 router.post('/checkout', uploadPayment.single('payment_proof'), createOrder);
 
