@@ -41,18 +41,25 @@
   @apply box-border flex min-h-[44px] w-full max-w-[320px] cursor-pointer items-center justify-center rounded-[50px] bg-[linear-gradient(180deg,#f8f140_0%,#f9099a_100%)] px-[16px] py-[10px] text-center font-(family-name:--font-inter) text-[18px] font-semibold tracking-[0.54px] text-white shadow-[0_4px_4px_rgba(0,0,0,0.25)] transition-transform duration-150 [text-shadow:0_0_4px_rgba(0,0,0,0.25)] active:scale-[0.98] lg:min-h-[48px] lg:max-w-[480px] lg:text-[clamp(20px,2vw,28px)] lg:tracking-[0.96px];
 }
 
-/* Pembungkus device (potret 9:16), di mobile berada di tengah */
+/* Pembungkus device (potret 9:16), di mobile berada di tengah.
+   Tinggi mengikuti layar (rasio 9:16 ada di .bf-hero-screen) */
 .bf-hero-device {
-  @apply box-border aspect-[9/16] w-[min(100%,300px)] self-center rounded-[36px] border border-white/30 bg-[#0b0f14] p-[10px] shadow-[0_0_15px_rgba(255,255,255,0.45),0_12px_32px_rgba(0,0,0,0.35)] [--bf-crop-bottom:90px] [--bf-crop-top:56px] lg:w-full lg:justify-self-center;
+  @apply box-border w-[min(100%,300px)] self-center rounded-[36px] border border-white/30 bg-[#0b0f14] p-[10px] shadow-[0_0_15px_rgba(255,255,255,0.45),0_12px_32px_rgba(0,0,0,0.35)] lg:w-full lg:justify-self-center;
 }
 
-/* Layar: iframe dibuat lebih besar lalu dipotong supaya hanya video yang terlihat */
+/* Layar = persis ukuran video (9:16). Iframe Instagram diperbesar lalu digeser
+   sehingga hanya video yang terlihat (tanpa header, footer, dan bar hitam kiri-kanan).
+   Penyetelan:
+   --bf-zoom      : lebar iframe dalam % lebar layar. Naikkan jika masih ada bar hitam
+                    di kiri/kanan, turunkan jika video terpotong di sisi.
+   --bf-crop-top  : tinggi header Instagram yang disembunyikan (px). Naikkan jika
+                    bagian atas masih ada garis/header, turunkan jika video terpotong. */
 .bf-hero-screen {
-  @apply relative h-full w-full overflow-hidden rounded-[26px] bg-black;
+  @apply relative aspect-[9/16] w-full overflow-hidden rounded-[26px] bg-black [--bf-crop-top:61px] [--bf-zoom:145] [container-type:inline-size];
 }
 
 .bf-hero-screen iframe {
-  @apply absolute top-[calc(var(--bf-crop-top)*-1)] left-0 block h-[calc(100%+var(--bf-crop-top)+var(--bf-crop-bottom))] w-full border-0;
+  @apply absolute top-[calc(var(--bf-crop-top)*-1)] left-[calc((100-var(--bf-zoom))/2*1cqw)] block h-[calc(var(--bf-zoom)*3cqw)] w-[calc(var(--bf-zoom)*1cqw)] max-w-none border-0;
 }
 
 /* Shared section heading */
