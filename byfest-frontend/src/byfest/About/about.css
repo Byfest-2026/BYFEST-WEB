@@ -306,18 +306,19 @@
   }
 
   .byfest-hero-right {
-    @apply flex shrink-0 flex-col items-start overflow-hidden border border-white/20 shadow-[0_0_15px_rgba(255,255,255,0.70)];
-    width: clamp(320px, 31vw, 440px);
-    height: clamp(500px, 43.4722vw, 626px);
-    border-radius: clamp(30px, 2.7778vw, 40px);
+    @apply flex shrink-0 flex-col items-start overflow-hidden border border-white/20 bg-white/5 shadow-[0_0_15px_rgba(255,255,255,0.70)] backdrop-blur-[10px];
+    width: clamp(320px, 30vw, 400px);
+    height: auto;
+    border-radius: clamp(24px, 2.5vw, 36px);
+    padding: clamp(16px, 1.8vw, 24px);
+    gap: clamp(12px, 1.2vw, 18px);
   }
 
   .byfest-hero-aftermovie-placeholder {
-    @apply flex w-full shrink-0 flex-col items-start bg-[#DEDEDE];
-    height: clamp(320px, 27vw, 390px);
-    gap: clamp(10px, 1vw, 14px);
-    padding-block: clamp(14px, 1.5vw, 20px) 0;
-    padding-inline: clamp(24px, 2.4396vw, 35.13px);
+    @apply flex w-full shrink-0 flex-col items-start bg-transparent;
+    height: auto;
+    gap: clamp(8px, 0.8vw, 12px);
+    padding: 0;
   }
 
   .byfest-hero-aftermovie-heading {
@@ -336,7 +337,7 @@
 
   .byfest-hero-aftermovie-video {
     @apply relative w-full shrink-0 overflow-hidden rounded-[12px] bg-black;
-    height: clamp(240px, 21vw, 300px);
+    height: clamp(300px, 28vw, 380px);
   }
 
   .byfest-hero-aftermovie-video iframe {
