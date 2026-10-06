@@ -61,7 +61,7 @@
 
 /* Mobile after movie */
 .byfest-aftermovie-card {
-  @apply mt-[10px] flex max-w-[337px] flex-col items-start rounded-[20px] border-[0.5px] border-white/10 bg-transparent overflow-hidden shadow-[0_4px_4px_rgba(0,0,0,0.25)];
+  @apply mt-[10px] flex max-w-[337px] flex-col items-start overflow-hidden rounded-[20px] border-[0.5px] border-white/20 bg-black/35 shadow-[0_4px_4px_rgba(0,0,0,0.25)];
   width: min(337px, calc(100% - 48px));
   height: auto;
   padding: 0;
@@ -78,24 +78,28 @@
 .byfest-aftermovie-video {
   position: relative;
   width: 100%;
-  aspect-ratio: 9 / 16;
-  max-height: 380px;
+  height: 420px;
   overflow: hidden;
   border-radius: 0;
+  background: #000;
 }
 
+/* iframe digeser ke atas supaya header IG tersembunyi,
+   tinggi ditambah supaya footer IG ikut terpotong */
 .byfest-aftermovie-video iframe {
+  position: absolute;
+  top: -60px;
+  left: 0;
   width: 100%;
-  height: 100%;
-  border: none;
-  object-fit: cover;
+  height: calc(100% + 130px);
+  border: 0;
 }
 
 /* Shared section heading */
 .byfest-section-heading {
   @apply flex w-full flex-col items-center gap-[4px];
 }
-  
+
 /* Vision */
 .byfest-vision {
   @apply mt-[10px] flex w-full flex-col items-center justify-center gap-[10px] px-[24px] py-[12px];
@@ -258,7 +262,7 @@
 
   .byfest-hero {
     @apply flex-row items-center justify-between py-[28px];
-    height: clamp(760px, 66.1111vw, 952px);
+    min-height: clamp(760px, 66.1111vw, 952px); /* sebelumnya height */
     gap: clamp(40px, 5vw, 80px);
   }
 
@@ -305,69 +309,73 @@
     @apply hidden;
   }
 
+  /* Panel kanan: latar gelap transparan supaya teks putih terbaca */
   .byfest-hero-right {
-    @apply flex shrink-0 flex-col items-start overflow-hidden border border-white/20 bg-white/5 shadow-[0_0_15px_rgba(255,255,255,0.70)] backdrop-blur-[10px];
+    @apply flex shrink-0 flex-col items-stretch overflow-hidden border border-white/30 bg-black/35 shadow-[0_0_15px_rgba(255,255,255,0.45)] backdrop-blur-[10px];
     width: clamp(320px, 30vw, 400px);
     height: auto;
+    align-self: center;
     border-radius: clamp(24px, 2.5vw, 36px);
     padding: clamp(16px, 1.8vw, 24px);
     gap: clamp(12px, 1.2vw, 18px);
   }
 
   .byfest-hero-aftermovie-placeholder {
-    @apply flex w-full shrink-0 flex-col items-start bg-transparent;
+    @apply flex w-full flex-col items-start bg-transparent;
     height: auto;
     gap: clamp(8px, 0.8vw, 12px);
     padding: 0;
   }
 
   .byfest-hero-aftermovie-heading {
-    @apply flex shrink-0 flex-col items-start gap-[2px] font-(family-name:--font-inter);
+    @apply flex flex-col items-start gap-[2px] font-(family-name:--font-inter);
   }
 
   .byfest-hero-aftermovie-heading span {
-    @apply font-normal text-[#666];
+    @apply font-normal text-white/70;
     font-size: clamp(13px, 1.15vw, 16px);
   }
 
   .byfest-hero-aftermovie-heading strong {
-    @apply font-semibold text-black;
-    font-size: clamp(20px, 1.9vw, 26px);
+    @apply font-semibold text-white;
+    font-size: clamp(18px, 1.7vw, 24px);
   }
 
   .byfest-hero-aftermovie-video {
-    @apply relative w-full shrink-0 overflow-hidden rounded-[12px] bg-black;
-    height: clamp(300px, 28vw, 380px);
+    @apply relative w-full overflow-hidden rounded-[12px] bg-black;
+    height: clamp(360px, 30vw, 440px);
   }
 
+  /* header & footer embed Instagram dipotong lewat offset */
   .byfest-hero-aftermovie-video iframe {
     position: absolute;
-    top: -55px;
+    top: -60px;
     left: 0;
     width: 100%;
-    height: calc(100% + 55px);
+    height: calc(100% + 130px);
     border: 0;
-    object-fit: cover;
   }
 
+  /* tidak lagi flex-1 / overflow-hidden / min-h-0 supaya teks tidak terjepit */
   .byfest-hero-aftermovie-content {
-    @apply flex min-h-0 w-full flex-1 flex-col items-start gap-[4px] overflow-hidden bg-transparent text-white;
-    padding: clamp(20px, 2.2vw, 30px);
+    @apply flex w-full flex-none flex-col items-start gap-[6px] bg-transparent text-white;
+    padding: 4px clamp(4px, 0.6vw, 8px) clamp(8px, 1vw, 12px);
   }
 
   .byfest-hero-theme-title {
-    @apply font-(family-name:--font-inter) font-bold;
+    @apply font-(family-name:--font-inter) font-bold text-white;
     font-size: clamp(24px, 2.2222vw, 32px);
   }
 
   .byfest-hero-theme-desc {
-    @apply w-full font-(family-name:--font-inter) leading-normal font-normal;
+    @apply w-full font-(family-name:--font-inter) leading-normal font-normal text-white/90;
     overflow-wrap: anywhere;
-    font-size: clamp(16px, 1.5278vw, 22px);
+    font-size: clamp(14px, 1.3vw, 18px);
   }
 
+  /* kartu mobile dipastikan hilang di desktop */
   .byfest-aftermovie-card {
-    @apply hidden;
+    display: none !important;
   }
 
   .byfest-vision {
