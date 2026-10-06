@@ -20,7 +20,7 @@ export default function QrisPaymentSection() {
       <div className="byfest-qris-form-card">
         <div className="byfest-qris-image-wrapper">
           <Image
-            src="/images/qris.png"
+            src="/images/qris.jpeg"
             alt="QRIS Code"
             width={160}
             height={160}
