@@ -1,7 +1,7 @@
 import React from "react";
 
 // PENTING: pakai shortcode reel ASLI yang sekarang sudah dipakai di project Anda
-const REEL_EMBED_URL = "https://www.instagram.com/reel/ISI_SHORTCODE_REEL/embed";
+const REEL_EMBED_URL = "https://www.instagram.com/reel/DaP45KKPP6Q/";
 
 export default function HeroSection() {
   return (
@@ -33,7 +33,7 @@ export default function HeroSection() {
 
         <div className="bf-hero-video">
           <iframe
-            src=https://www.instagram.com/reel/DaP45KKPP6Q/
+            src={REEL_EMBED_URL}
             title="After Movie BYFEST 2025"
             loading="lazy"
             scrolling="no"
