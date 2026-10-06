@@ -27,8 +27,9 @@ export default function HeroSection({
         </p>
 
        <button type="button" className="bf-hero-btn" onClick={() => router.push("/program")}>
-  Look Our Program
-</button>
+      Look Our Program
+      </button>
+        
       </div>
 
       {/* Pembungkus device (rasio potret). Header & footer Instagram dipotong,
