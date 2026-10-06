@@ -58,12 +58,14 @@
 
 /* Mobile after movie */
 .byfest-aftermovie-card {
-  @apply mt-[10px] flex h-[180px] max-w-[337px] flex-col items-start gap-[10px] rounded-[20px] border-[0.5px] border-white/10 bg-transparent p-[10px] shadow-[0_4px_4px_rgba(0,0,0,0.25)];
+  @apply mt-[10px] flex max-w-[337px] flex-col items-start rounded-[20px] border-[0.5px] border-white/10 bg-transparent overflow-hidden shadow-[0_4px_4px_rgba(0,0,0,0.25)];
   width: min(337px, calc(100% - 48px));
+  height: auto; /* Ubah dari fixed 180px agar menyesuaikan isi */
+  padding: 0; /* Hilangkan padding luar agar video menempel presisi */
 }
 
 .byfest-aftermovie-title {
-  @apply font-(family-name:--font-inter) text-[12px] leading-none font-normal text-white;
+  @apply font-(family-name:--font-inter) text-[12px] leading-none font-normal text-white p-3;
 }
 
 .byfest-aftermovie-title strong {
@@ -71,27 +73,26 @@
 }
 
 .byfest-aftermovie-video {
-    position: relative;
-    width: 100%;
-    /* Sesuaikan tinggi sesuai kebutuhan desain Anda */
-    height: 350px; 
-    overflow: hidden;
-    border-radius: 12px;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 9 / 16; /* Menjaga proporsi Reels dengan sempurna */
+  max-height: 380px; /* Batasi tinggi maksimal agar tidak terlalu panjang */
+  overflow: hidden;
+  border-radius: 0; /* Mengikuti bentuk sudut kartu atas */
 }
 
 .byfest-aftermovie-video iframe {
-    width: 100%;
-    height: 100%;
-    border: none;
-    /* Opsional: Trik untuk membesarkan sedikit iframe agar header/footer bawaan instagram tidak terlihat */
-    transform: scale(1.02); 
+  width: 100%;
+  height: 100%;
+  border: none;
+  object-fit: cover;
 }
 
 /* Shared section heading */
 .byfest-section-heading {
   @apply flex w-full flex-col items-center gap-[4px];
 }
-
+  
 /* Vision */
 .byfest-vision {
   @apply mt-[10px] flex w-full flex-col items-center justify-center gap-[10px] px-[24px] py-[12px];
