@@ -8,30 +8,66 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Helper untuk mengekstrak public_id Cloudinary dari URL gambar
-const getPublicIdFromUrl = (url) => {
-  if (!url) return null;
+// Helper: ekstrak public_id & resource_type Cloudinary dari URL
+// Contoh: https://res.cloudinary.com/xxx/image/upload/v123/byfest_bukti_tf/file.jpg
+//   -> { publicId: 'byfest_bukti_tf/file', resourceType: 'image' }
+const parseCloudinaryUrl = (url) => {
+  if (!url || typeof url !== 'string') return null;
   try {
-    // Contoh URL: https://res.cloudinary.com/rcroqsd5/image/upload/v12345/byfest_bukti_tf/filename.jpg
-    const parts = url.split('/');
-    const filename = parts.pop().split('.')[0]; // nama file tanpa ekstensi
-    const folder = parts.pop(); // byfest_bukti_tf
-    return `\({folder}/\){filename}`;
+    const match = url.match(/\/(image|raw|video)\/upload\/(?:v\d+\/)?(.+)$/);
+    if (!match) return null;
+
+    const resourceType = match[1];
+    let publicId = match[2].split('?')[0];
+
+    // Untuk image/video, public_id tanpa ekstensi. Untuk raw, ekstensi ikut.
+    if (resourceType !== 'raw') {
+      publicId = publicId.replace(/\.[^./]+$/, '');
+    }
+
+    return { publicId, resourceType };
   } catch (err) {
     return null;
   }
 };
 
-// Helper untuk menghapus file dari Cloudinary jika transaksi gagal / dibatalkan
+// Helper: hapus file di Cloudinary berdasarkan URL
+const destroyByUrl = async (url) => {
+  const parsed = parseCloudinaryUrl(url);
+  if (!parsed) return;
+
+  try {
+    await cloudinary.uploader.destroy(parsed.publicId, {
+      resource_type: parsed.resourceType,
+    });
+  } catch (err) {
+    console.error('Gagal menghapus file di Cloudinary:', err.message);
+  }
+};
+
+// Helper: hapus file upload dari request (dipakai saat transaksi gagal / dibatalkan)
 const removeCloudinaryFile = async (req) => {
   if (req.file && req.file.path) {
-    const publicId = getPublicIdFromUrl(req.file.path);
-    if (publicId) {
-      await cloudinary.uploader.destroy(publicId).catch((err) => {
-        console.error('Gagal menghapus file rollback di Cloudinary:', err.message);
-      });
+    await destroyByUrl(req.file.path);
+  }
+};
+
+// Helper: rollback aman (tidak error kalau transaksi sudah selesai)
+const safeRollback = async (t) => {
+  if (t && !t.finished) {
+    try {
+      await t.rollback();
+    } catch (err) {
+      console.error('Gagal rollback transaksi:', err.message);
     }
   }
+};
+
+// Helper: kirim error validasi (rollback + hapus file + balas JSON)
+const failWith = async (req, res, t, status, message) => {
+  await safeRollback(t);
+  await removeCloudinaryFile(req);
+  return res.status(status).json({ success: false, message });
 };
 
 // 1. User: Checkout (dengan Pengurangan Kuota Program & Upload ke Cloudinary)
@@ -43,69 +79,84 @@ const createOrder = async (req, res) => {
     const { buyer_name, phone, email, items, total_amount } = req.body;
 
     if (!req.file) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Bukti pembayaran wajib diunggah!' 
-      });
+      return failWith(req, res, t, 400, 'Bukti pembayaran wajib diunggah!');
     }
 
-    // Parse items jika dikirim dalam bentuk string JSON dari frontend / Thunder Client
-    const parsedItems = typeof items === 'string' ? JSON.parse(items) : items;
+    if (!buyer_name || !phone || !email) {
+      return failWith(req, res, t, 400, 'Nama, nomor telepon, dan email wajib diisi.');
+    }
+
+    // Parse items jika dikirim sebagai string JSON dari frontend / Thunder Client
+    let parsedItems;
+    try {
+      parsedItems = typeof items === 'string' ? JSON.parse(items) : items;
+    } catch (parseErr) {
+      return failWith(req, res, t, 400, 'Format item tiket tidak valid.');
+    }
 
     if (!Array.isArray(parsedItems) || parsedItems.length === 0) {
-      await removeCloudinaryFile(req);
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Item tiket tidak valid atau kosong.' 
-      });
+      return failWith(req, res, t, 400, 'Item tiket tidak valid atau kosong.');
     }
 
     // A. VALIDASI & POTONG KUOTA PROGRAM
     for (const item of parsedItems) {
-      const program = await Program.findByPk(item.id, { transaction: t });
+      const qty = Number(item.qty);
+
+      if (!Number.isInteger(qty) || qty <= 0) {
+        return failWith(req, res, t, 400, `Jumlah tiket untuk "${item.name || item.id}" tidak valid.`);
+      }
+
+      // Tiket pass (mis. "all-day") bukan program, jadi tidak memotong kuota
+      if (!/^\d+$/.test(String(item.id))) continue;
+
+      const programId = parseInt(item.id, 10);
+
+      const program = await Program.findByPk(programId, {
+        transaction: t,
+        lock: t.LOCK.UPDATE, // kunci baris agar kuota tidak balapan antar pembeli
+      });
 
       if (!program) {
-        await t.rollback();
-        await removeCloudinaryFile(req);
-        return res.status(404).json({
-          success: false,
-          message: `Program dengan ID ${item.id} tidak ditemukan.`
-        });
+        return failWith(req, res, t, 404, `Program dengan ID ${programId} tidak ditemukan.`);
       }
 
       // Cek ketersediaan kuota
-      if (program.quota < item.qty) {
-        await t.rollback();
-        await removeCloudinaryFile(req);
-        return res.status(400).json({
-          success: false,
-          message: `Kuota untuk program "\({program.title || program.name}" tidak mencukupi (Sisa:\){program.quota}).`
-        });
+      if (program.quota < qty) {
+        return failWith(
+          req,
+          res,
+          t,
+          400,
+          `Kuota untuk program "${program.name}" tidak mencukupi (Sisa: ${program.quota}).`
+        );
       }
 
       // Kurangi kuota program
       await program.decrement('quota', {
-        by: item.qty,
-        transaction: t
+        by: qty,
+        transaction: t,
       });
     }
 
     // B. BUAT KODE ORDER & SIMPAN KE DATABASE
-    const orderCode = `BYF-\({Date.now().toString().slice(-6)}-\){Math.floor(1000 + Math.random() * 9000)}`;
+    const orderCode = `BYF-${Date.now().toString().slice(-6)}-${Math.floor(1000 + Math.random() * 9000)}`;
 
-    // req.file.path otomatis berisi URL HTTPS publik resmi dari Cloudinary
+    // req.file.path berisi URL HTTPS publik dari Cloudinary
     const paymentProofUrl = req.file.path;
 
-    const newOrder = await Order.create({
-      order_code: orderCode,
-      buyer_name,
-      phone,
-      email,
-      tickets_summary: typeof items === 'string' ? items : JSON.stringify(items),
-      total_amount: Number(total_amount),
-      payment_proof: paymentProofUrl, // Menyimpan URL Cloudinary
-      status: 'pending'
-    }, { transaction: t });
+    const newOrder = await Order.create(
+      {
+        order_code: orderCode,
+        buyer_name,
+        phone,
+        email,
+        tickets_summary: JSON.stringify(parsedItems),
+        total_amount: Number(total_amount) || 0,
+        payment_proof: paymentProofUrl,
+        status: 'pending',
+      },
+      { transaction: t }
+    );
 
     // Commit seluruh transaksi jika berhasil
     await t.commit();
@@ -116,20 +167,19 @@ const createOrder = async (req, res) => {
       data: {
         order_code: newOrder.order_code,
         status: newOrder.status,
-        payment_proof: newOrder.payment_proof
-      }
+        payment_proof: newOrder.payment_proof,
+      },
     });
-
   } catch (error) {
-    // Batalkan seluruh transaksi database & hapus file yang terunggah di Cloudinary
-    await t.rollback();
+    // Batalkan transaksi database & hapus file yang terunggah di Cloudinary
+    await safeRollback(t);
     await removeCloudinaryFile(req);
 
     console.error('Error createOrder:', error);
     return res.status(500).json({
       success: false,
       message: 'Gagal memproses pesanan.',
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -140,6 +190,7 @@ const getAllOrders = async (req, res) => {
     const orders = await Order.findAll({ order: [['created_at', 'DESC']] });
     return res.status(200).json({ success: true, data: orders });
   } catch (error) {
+    console.error('Error getAllOrders:', error);
     return res.status(500).json({ success: false, message: 'Gagal mengambil data pesanan.' });
   }
 };
@@ -156,6 +207,7 @@ const getOrderById = async (req, res) => {
 
     return res.status(200).json({ success: true, data: order });
   } catch (error) {
+    console.error('Error getOrderById:', error);
     return res.status(500).json({ success: false, message: 'Gagal mengambil detail pesanan.' });
   }
 };
@@ -172,12 +224,7 @@ const deleteOrder = async (req, res) => {
 
     // Jika pesanan memiliki bukti pembayaran, hapus filenya dari Cloudinary
     if (order.payment_proof) {
-      const publicId = getPublicIdFromUrl(order.payment_proof);
-      if (publicId) {
-        await cloudinary.uploader.destroy(publicId).catch((err) => {
-          console.error('Gagal menghapus file dari Cloudinary:', err.message);
-        });
-      }
+      await destroyByUrl(order.payment_proof);
     }
 
     // Hapus data order dari database PostgreSQL
@@ -193,5 +240,5 @@ module.exports = {
   createOrder,
   getAllOrders,
   getOrderById,
-  deleteOrder
+  deleteOrder,
 };
