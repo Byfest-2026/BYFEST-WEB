@@ -1,68 +1,52 @@
 import React from "react";
 
-const REEL_URL = "https://www.instagram.com/reel/ISI_SHORTCODE_REEL/embed"; // ganti dengan shortcode asli
+// PENTING: pakai shortcode reel ASLI yang sekarang sudah dipakai di project Anda
+const REEL_EMBED_URL = "https://www.instagram.com/reel/ISI_SHORTCODE_REEL/embed";
 
 export default function HeroSection() {
   return (
-    <section className="byfest-hero">
-      <div className="byfest-hero-left">
-        <div className="byfest-hero-badge">
-          <span className="byfest-hero-badge-text">7 Years of Byfest Journey</span>
-        </div>
-        <h1 className="byfest-hero-title">
-          BRAWIJAYA <br className="byfest-hero-title-break" />
-          FILM <br className="byfest-hero-title-break" />
+    <section className="bf-hero">
+      <div className="bf-hero-text">
+        <div className="bf-hero-badge">7 Years of Byfest Journey</div>
+
+        <h1 className="bf-hero-title">
+          BRAWIJAYA <br className="bf-hero-br" />
+          FILM <br className="bf-hero-br" />
           FESTIVAL
         </h1>
-        <p className="byfest-hero-desc">
-          Brawijaya Film Festival adalah perwujudan kolektif dari semangat sineas muda untuk...
+
+        <p className="bf-hero-desc">
+          Brawijaya Film Festival adalah perwujudan kolektif dari semangat sineas
+          muda untuk...
         </p>
-        <button className="byfest-hero-btn">
-          <span className="byfest-hero-btn-text">Get Tickets</span>
+
+        <button type="button" className="bf-hero-btn">
+          Get Tickets
         </button>
       </div>
 
-      {/* Desktop */}
-      <div className="byfest-hero-right">
-        <div className="byfest-hero-aftermovie-placeholder">
-          <div className="byfest-hero-aftermovie-heading">
-            <span>brawijayafilm...</span>
-            <strong>Original audio</strong>
-          </div>
-          <div className="byfest-hero-aftermovie-video">
-            <iframe
-              src={REEL_URL}
-              title="After Movie BYFEST"
-              loading="lazy"
-              scrolling="no"
-              allow="encrypted-media; fullscreen"
-              allowFullScreen
-            />
-          </div>
-        </div>
-        <div className="byfest-hero-aftermovie-content">
-          <h3 className="byfest-hero-theme-title">Theme</h3>
-          <p className="byfest-hero-theme-desc">Deskripsi tema film festival...</p>
-        </div>
-      </div>
+      {/* Satu kartu untuk mobile & desktop */}
+      <aside className="bf-hero-media">
+        <p className="bf-hero-media-label">
+          After Movie <strong>BYFEST 2025</strong>
+        </p>
 
-      {/* Mobile */}
-      <div className="byfest-aftermovie-card">
-        <div className="byfest-aftermovie-title">
-          <span>brawijayafilm... </span>
-          <strong>Original audio</strong>
-        </div>
-        <div className="byfest-aftermovie-video">
+        <div className="bf-hero-video">
           <iframe
-            src={REEL_URL}
-            title="After Movie BYFEST Mobile"
+            src={REEL_EMBED_URL}
+            title="After Movie BYFEST 2025"
             loading="lazy"
             scrolling="no"
             allow="encrypted-media; fullscreen"
             allowFullScreen
           />
         </div>
-      </div>
+
+        <div className="bf-hero-theme">
+          <h2>Theme</h2>
+          <p>Deskripsi tema film festival...</p>
+        </div>
+      </aside>
     </section>
   );
 }
