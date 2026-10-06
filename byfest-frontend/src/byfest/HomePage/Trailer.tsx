@@ -3,13 +3,12 @@ import "./Homepage.css";
 import React from "react";
 import Image from "next/image";
 
-
 interface TrailerProps {
-  youtubeEmbedUrl?: string;
+  instagramEmbedUrl?: string;
 }
 
 export default function Trailer({ 
-  youtubeEmbedUrl = "https://www.youtube.com/embed/dQw4w9WgXcQ" 
+  instagramEmbedUrl = "https://www.instagram.com/reel/DQdZtMdEZgw/embed" 
 }: TrailerProps) {
   return (
     <section className="trailer-section" id="trailer">
@@ -60,13 +59,15 @@ export default function Trailer({
         {/* Frame Video Player */}
         <div className="trailer-video-outer">
           <div className="trailer-video-box">
-            {youtubeEmbedUrl && (
+            {instagramEmbedUrl && (
               <iframe
-                src={`${youtubeEmbedUrl}?autoplay=0&rel=0`}
-                title="BYFEST 2026 Official Trailer"
+                src={instagramEmbedUrl}
+                title="BYFEST 2026 Instagram Reel"
                 className="trailer-iframe"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
                 allowFullScreen
+                scrolling="no"
+                frameBorder="0"
               />
             )}
           </div>
