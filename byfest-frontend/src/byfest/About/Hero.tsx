@@ -7,7 +7,7 @@ interface HeroProps {
 }
 
 export default function HeroSection({
-  instagramEmbedUrl = "https://www.instagram.com/reel/DaP45KKPP6Q/embed",
+  instagramEmbedUrl = "https://www.instagram.com/reel/Dd8Txh6S93d/embed",
 }: HeroProps) {
   return (
     <section className="bf-hero">
