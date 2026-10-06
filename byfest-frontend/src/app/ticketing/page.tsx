@@ -17,7 +17,7 @@ import ConfirmPaymentSection from "@/byfest/Ticketing/ConfirmPaymentSectionProps
 import ConfirmationModal from "@/byfest/Ticketing/ConfirmationModal";
 import ScrollToTop from "@/byfest/ScrollToTop/ScrollToTop";
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_FILE_SIZE = 4 * 1024 * 1024; // 4MB (batas body Vercel Serverless ~4.5MB)
 const ACCEPTED_FILE_TYPES = ["image/jpeg", "image/jpg", "image/png", "application/pdf"];
 
 // Base URL backend (tanpa "/api" dan tanpa "/" di akhir).
@@ -46,15 +46,17 @@ function TicketingContent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
-  // Kalau datang dari tombol "Book Your Spot" di halaman Program (/ticketing?program=2)
+  // Kalau datang dari tombol "Book Your Spot" di halaman Program (/ticketing?program=7)
+  // ID tiket di TICKETS sama dengan ID program (contoh: "7")
   useEffect(() => {
     const programParam = searchParams.get("program");
     if (!programParam) return;
 
-    const ticketId = `prog-${programParam}`;
-    const match = TICKETS.find((t) => t.id === ticketId);
+    const match = TICKETS.find((t) => t.id === programParam);
     if (match) {
-      setTicketQty((prev) => (prev[ticketId] ? prev : { ...prev, [ticketId]: 1 }));
+      setTicketQty((prev) =>
+        prev[programParam] ? prev : { ...prev, [programParam]: 1 }
+      );
     }
   }, [searchParams]);
 
@@ -75,7 +77,7 @@ function TicketingContent() {
       return;
     }
     if (file.size > MAX_FILE_SIZE) {
-      setFileError("Ukuran file maksimal 5MB.");
+      setFileError("Ukuran file maksimal 4MB.");
       setFileName("");
       setPaymentProofFile(null);
       return;
