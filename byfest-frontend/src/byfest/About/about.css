@@ -51,7 +51,10 @@
   @apply font-(family-name:--font-inter) text-[18px] leading-normal font-semibold tracking-[0.54px] whitespace-nowrap text-white [text-shadow:0_0_4px_rgba(0,0,0,0.25)];
 }
 
-.byfest-hero-divider,
+.byfest-hero-divider {
+  @apply hidden;
+}
+
 .byfest-hero-right {
   @apply hidden;
 }
@@ -254,14 +257,14 @@
   }
 
   .byfest-hero {
-    @apply flex-row items-center justify-center py-[28px];
+    @apply flex-row items-center justify-between py-[28px];
     height: clamp(760px, 66.1111vw, 952px);
-    gap: clamp(32px, 4.375vw, 63px);
+    gap: clamp(40px, 5vw, 80px);
   }
 
   .byfest-hero-left {
     @apply min-w-0 flex-1 px-[10px];
-    max-width: 550px;
+    max-width: 600px;
     height: clamp(650px, 55.2778vw, 796px);
     gap: clamp(22px, 2.3611vw, 34px);
     padding-block: clamp(32px, 3.4722vw, 50px);
@@ -299,20 +302,12 @@
   }
 
   .byfest-hero-divider {
-    @apply block w-px shrink-0;
-    height: clamp(700px, 62.2222vw, 896px);
-    background: linear-gradient(
-      180deg,
-      rgba(26, 34, 159, 0) 0%,
-      #fff 30%,
-      #fff 70%,
-      rgba(26, 34, 159, 0) 100%
-    );
+    @apply hidden;
   }
 
   .byfest-hero-right {
     @apply flex shrink-0 flex-col items-start overflow-hidden border border-white/20 shadow-[0_0_15px_rgba(255,255,255,0.70)];
-    width: clamp(304px, 29.7222vw, 428px);
+    width: clamp(320px, 31vw, 440px);
     height: clamp(500px, 43.4722vw, 626px);
     border-radius: clamp(30px, 2.7778vw, 40px);
   }
