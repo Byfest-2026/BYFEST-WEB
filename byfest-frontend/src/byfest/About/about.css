@@ -15,8 +15,10 @@
 }
 
 /* =========================================================
-   HERO (ditulis ulang, CSS biasa, kelas bf-hero-*)
-   Ubah tinggi video lewat variabel --bf-video-h
+   HERO (CSS biasa, kelas bf-hero-*)
+   Tinggi video: ubah --bf-video-h
+   Crop header/footer Instagram: ubah top & height di
+   ".bf-hero-video iframe" (header ~ -64px, footer ~ +190px total)
    ========================================================= */
 .bf-hero {
   --bf-video-h: 560px;
@@ -132,7 +134,10 @@
   font-weight: 600;
 }
 
+/* Kotak video: iframe dibuat lebih besar lalu dipotong (overflow hidden)
+   supaya hanya videonya yang terlihat */
 .bf-hero-video {
+  position: relative;
   width: 100%;
   height: var(--bf-video-h);
   overflow: hidden;
@@ -141,9 +146,11 @@
 }
 
 .bf-hero-video iframe {
-  display: block;
+  position: absolute;
+  top: -64px;
+  left: 0;
   width: 100%;
-  height: 100%;
+  height: calc(100% + 190px);
   border: 0;
 }
 
