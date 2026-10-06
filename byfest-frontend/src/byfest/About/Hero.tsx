@@ -33,7 +33,7 @@ export default function HeroSection() {
 
         <div className="bf-hero-video">
           <iframe
-            src={REEL_EMBED_URL}
+            src={https://www.instagram.com/reel/DaP45KKPP6Q/}
             title="After Movie BYFEST 2025"
             loading="lazy"
             scrolling="no"
