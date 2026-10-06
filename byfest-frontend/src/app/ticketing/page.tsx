@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, useEffect, useRef, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import "@/byfest/Ticketing/Ticketing.css";
 import Navbar from "@/byfest/Navbar/Navbar";
@@ -19,6 +19,11 @@ import ScrollToTop from "@/byfest/ScrollToTop/ScrollToTop";
 
 const MAX_FILE_SIZE = 4 * 1024 * 1024; // 4MB (batas body Vercel Serverless ~4.5MB)
 const ACCEPTED_FILE_TYPES = ["image/jpeg", "image/jpg", "image/png", "application/pdf"];
+const MAX_QTY_PER_ITEM = 10; // samakan dengan MAX_QTY_PER_ITEM di backend
+const REQUEST_TIMEOUT_MS = 45000;
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PHONE_RE = /^\+?\d{9,15}$/;
 
 // Base URL backend (tanpa "/api" dan tanpa "/" di akhir).
 // Prioritas: env variable Vercel, cadangan: URL backend produksi.
@@ -27,6 +32,11 @@ const API_BASE_URL = (
 )
   .replace(/\/+$/, "") // buang "/" di akhir
   .replace(/\/api$/, ""); // buang "/api" kalau terlanjur ada
+
+type CheckoutResponse = {
+  success?: boolean;
+  message?: string;
+};
 
 function TicketingContent() {
   const searchParams = useSearchParams();
@@ -44,10 +54,13 @@ function TicketingContent() {
   const [fileError, setFileError] = useState<string>("");
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string>("");
   const [showModal, setShowModal] = useState(false);
 
+  // Guard double-submit (state saja bisa lolos kalau tap dua kali sangat cepat)
+  const submittingRef = useRef(false);
+
   // Kalau datang dari tombol "Book Your Spot" di halaman Program (/ticketing?program=7)
-  // ID tiket di TICKETS sama dengan ID program (contoh: "7")
   useEffect(() => {
     const programParam = searchParams.get("program");
     if (!programParam) return;
@@ -61,7 +74,10 @@ function TicketingContent() {
   }, [searchParams]);
 
   const handleQtyChange = (id: string, qty: number) => {
-    setTicketQty((prev) => ({ ...prev, [id]: Math.max(0, qty) }));
+    setTicketQty((prev) => ({
+      ...prev,
+      [id]: Math.min(MAX_QTY_PER_ITEM, Math.max(0, qty)),
+    }));
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -102,28 +118,38 @@ function TicketingContent() {
     qty: ticketQty[t.id],
   }));
   const selectedCount = selectedTickets.reduce((sum, t) => sum + t.qty, 0);
+  // Total ini hanya untuk tampilan. Total yang dipakai tetap dihitung server.
   const totalAmount = selectedTickets.reduce((sum, t) => sum + t.qty * t.price, 0);
+
+  const normalizedPhone = formData.phoneNumber.replace(/[\s\-()]/g, "");
 
   const isFormValid =
     selectedCount > 0 &&
     formData.fullName.trim() !== "" &&
-    formData.phoneNumber.trim() !== "" &&
-    formData.email.trim() !== "" &&
+    PHONE_RE.test(normalizedPhone) &&
+    EMAIL_RE.test(formData.email.trim()) &&
     paymentProofFile !== null;
 
   const handleSubmit = async () => {
-    if (!isFormValid || isSubmitting) return;
+    if (!isFormValid || submittingRef.current) return;
 
+    submittingRef.current = true;
     setIsSubmitting(true);
+    setSubmitError("");
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
     try {
       const payload = new FormData();
-      // SESUAIKAN DENGAN FIELD DI CONTROLLER EXPRESS
-      payload.append("buyer_name", formData.fullName);
-      payload.append("phone", formData.phoneNumber);
-      payload.append("email", formData.email);
-      payload.append("items", JSON.stringify(selectedTickets));
-      payload.append("total_amount", totalAmount.toString());
+      payload.append("buyer_name", formData.fullName.trim());
+      payload.append("phone", normalizedPhone);
+      payload.append("email", formData.email.trim());
+      // Hanya id & qty yang dikirim. Harga dan total dihitung di server.
+      payload.append(
+        "items",
+        JSON.stringify(selectedTickets.map(({ id, qty }) => ({ id, qty })))
+      );
 
       if (paymentProofFile) {
         // Harus 'payment_proof' sesuai Multer di backend
@@ -133,26 +159,44 @@ function TicketingContent() {
       const res = await fetch(`${API_BASE_URL}/api/ticketing/checkout`, {
         method: "POST",
         body: payload,
+        signal: controller.signal,
       });
 
       // Backend bisa membalas non-JSON (misalnya halaman error Vercel),
-      // jadi parse dengan aman supaya pesan error-nya jelas.
-      let data: { success?: boolean; message?: string } = {};
+      // jadi parse dengan aman.
+      let data: CheckoutResponse = {};
       try {
         data = await res.json();
       } catch {
-        data = { message: `Server membalas status ${res.status} (bukan JSON).` };
+        data = {};
       }
 
       if (res.ok && data.success) {
-        setShowModal(true); // Tampilkan ConfirmationModal.tsx
+        setShowModal(true); // Tampilkan ConfirmationModal
+        return;
+      }
+
+      if (res.status === 413) {
+        setSubmitError("File terlalu besar. Maksimal 4MB.");
+      } else if (res.status >= 500 && !data.message) {
+        setSubmitError(`Server sedang bermasalah (status ${res.status}). Coba lagi sebentar.`);
       } else {
-        alert(`Gagal memesan tiket: ${data.message || "Terjadi kesalahan"}`);
+        setSubmitError(data.message || "Terjadi kesalahan saat memesan tiket.");
       }
     } catch (err) {
       console.error("Gagal mengirim pesanan:", err, "URL:", API_BASE_URL);
-      alert("Gagal terhubung ke server.");
+      if (err instanceof DOMException && err.name === "AbortError") {
+        setSubmitError(
+          "Server terlalu lama merespons. Cek koneksi internet, lalu coba lagi."
+        );
+      } else {
+        setSubmitError(
+          "Tidak dapat menghubungi server. Periksa koneksi internet, lalu coba lagi."
+        );
+      }
     } finally {
+      clearTimeout(timeoutId);
+      submittingRef.current = false;
       setIsSubmitting(false);
     }
   };
@@ -162,6 +206,8 @@ function TicketingContent() {
     setTicketQty({});
     setFormData({ fullName: "", phoneNumber: "", email: "" });
     setFileName("");
+    setFileError("");
+    setSubmitError("");
     setPaymentProofFile(null);
   };
 
@@ -186,6 +232,20 @@ function TicketingContent() {
           onFileChange={handleFileChange}
           onFileDrop={handleFileDrop}
         />
+
+        {submitError && (
+          <p
+            role="alert"
+            style={{
+              color: "#ff6b6b",
+              textAlign: "center",
+              margin: "12px 0",
+              fontSize: "14px",
+            }}
+          >
+            {submitError}
+          </p>
+        )}
 
         <ConfirmPaymentSection
           disabled={!isFormValid || isSubmitting}
