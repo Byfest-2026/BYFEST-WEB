@@ -56,13 +56,12 @@
   @apply absolute inset-0 w-full h-full pointer-events-none z-0;
 }
 
-/* Scalable Canvas:
-   Mobile: Berikan tinggi yang proporsional (min 620px - 680px) agar video reel terlihat utuh
-   Desktop (lg+): Rasio aspek proporsional 1440/1024 seperti semula */
+/* Scalable Canvas: 
+   Mobile: Rasio proporsional 402/328
+   Desktop: Rasio proporsional 1440/1024 */
 .trailer-canvas {
   @apply relative w-full max-w-[1440px] mx-auto z-10
-         min-h-[620px] sm:min-h-[680px] lg:min-h-0
-         lg:aspect-[1440/1024];
+         aspect-[402/328] lg:aspect-[1440/1024];
 }
 
 /* Helper Class Image */
@@ -78,13 +77,12 @@
   @apply w-full h-full object-contain object-center;
 }
 
-/* 1. Gunung Kiri (Sesuai Asli di Mobile, Mentok Layar di Desktop) */
+/* 1. Gunung Kiri */
 .trailer-mountain-left {
   @apply absolute bottom-0 left-0 pointer-events-none z-10
-         w-[42%] max-w-[200px] h-[160px] sm:h-[220px]
+         w-[42.79%] h-[81.71%]
          flex items-end justify-start
-         /* Kunci hanya untuk Desktop (lg: / 1024px+) */
-         lg:left-[calc(50%-50vw)] lg:w-[50vw] lg:max-w-none lg:h-[83%]
+         lg:left-[calc(50%-50vw)] lg:w-[50vw] lg:h-[83%]
          min-[1920px]:h-[85%];
 }
 
@@ -93,13 +91,12 @@
   @apply w-full h-full object-contain object-left-bottom;
 }
 
-/* 2. Gunung Kanan (Sesuai Asli di Mobile, Mentok Layar di Desktop) */
+/* 2. Gunung Kanan */
 .trailer-mountain-right {
   @apply absolute bottom-0 right-0 pointer-events-none z-10
-         w-[42%] max-w-[200px] h-[160px] sm:h-[220px]
+         w-[42.79%] h-[81.71%]
          flex items-end justify-end
-         /* Kunci hanya untuk Desktop (lg: / 1024px+) */
-         lg:right-[calc(50%-50vw)] lg:w-[50vw] lg:max-w-none lg:h-[83%]
+         lg:right-[calc(50%-50vw)] lg:w-[50vw] lg:h-[83%]
          min-[1920px]:h-[85%];
 }
 
@@ -111,18 +108,18 @@
 /* 3. Title BYFEST 2026 */
 .trailer-title-wrapper {
   @apply absolute left-1/2 -translate-x-1/2 pointer-events-none z-20
-         top-[18px] sm:top-[24px] w-[58%] max-w-[240px] h-[55px] sm:h-[70px]
+         top-[3.65%] w-[47.26%] h-[30.48%]
          lg:top-[2.93%] lg:w-[37.92%] lg:max-w-none lg:h-[30.86%]
          min-[1920px]:top-[3%] min-[1920px]:w-[36%];
 }
 
-/* 4. Frame Video Outer */
+/* 4. Frame Video Outer: 16:9 widescreen di mobile dan desktop */
 .trailer-video-outer {
   @apply absolute left-1/2 -translate-x-1/2 z-30
          flex items-center justify-center pointer-events-auto
-         /* Mobile: Berikan tinggi vertikal cukup agar Instagram Reel/video terlihat utuh */
-         top-[82px] sm:top-[105px] bottom-auto w-[90%] max-w-[340px] sm:max-w-[400px] h-[490px] sm:h-[530px]
-         p-[10px] sm:p-[12px] rounded-[22px]
+         /* Mobile: 16:9 widescreen frame */
+         top-[38%] bottom-auto w-[85%] max-w-[340px] sm:max-w-[420px] aspect-video
+         p-[5px] sm:p-[8px] rounded-[16px]
          /* Desktop */
          lg:top-auto lg:bottom-[5%] lg:w-[75%] lg:max-w-none lg:h-auto lg:aspect-video
          lg:p-[1.5%] lg:rounded-[32px]
@@ -134,11 +131,16 @@
 }
 
 .trailer-video-box {
-  @apply w-full h-full rounded-[14px] sm:rounded-[18px] lg:rounded-[24px] min-[1920px]:rounded-[32px] bg-black overflow-hidden shrink-0;
+  @apply relative w-full h-full aspect-video rounded-[10px] sm:rounded-[14px] lg:rounded-[24px] min-[1920px]:rounded-[32px] bg-black overflow-hidden shrink-0;
 }
 
+/* CROP INSTAGRAM EMBED:
+   Potong header Instagram di atas (-55px) dan footer/komentar di bawah,
+   sehingga HANYA video widescreen 16:9 yang tampil bersih dan utuh! */
 .trailer-iframe {
-  @apply w-full h-full border-none;
+  @apply absolute left-0 w-full border-none;
+  top: -55px;
+  height: calc(100% + 220px);
 }
 
 /* ==========================================
