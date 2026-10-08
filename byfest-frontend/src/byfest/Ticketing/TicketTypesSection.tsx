@@ -1,9 +1,7 @@
-// src/byfest/Ticketing/components/TicketTypesSection.tsx
-"use client";
-
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import "./Ticketing.css";
+import { API_BASE_URL, formatImageUrl } from "@/config/api";
 
 export interface TicketOption {
   id: string;
@@ -13,8 +11,6 @@ export interface TicketOption {
 }
 
 // Sumber data tunggal untuk semua tiket + harganya.
-// Diimpor juga oleh page.tsx (buat hitung total & pre-select dari query param)
-// dan OrderSummarySection (buat format angka).
 export const TICKETS: TicketOption[] = [
   { id: "all-day", name: "All Day Pass", price: 100000 },
   { id: "program1", name: "Program 1", price: 35000 },
@@ -45,6 +41,32 @@ export default function TicketTypesSection({
   quantities,
   onQtyChange,
 }: TicketTypesSectionProps) {
+  const [programMap, setProgramMap] = useState<Record<string, { image?: string; name?: string }>>({});
+
+  useEffect(() => {
+    async function loadPrograms() {
+      try {
+        const res = await fetch(`${API_BASE_URL}/programs`);
+        if (res.ok) {
+          const result = await res.json();
+          const list = Array.isArray(result) ? result : result.data || [];
+          const mapping: Record<string, { image?: string; name?: string }> = {};
+          list.forEach((p: any, idx: number) => {
+            const numKey = `program${idx + 1}`;
+            const idKey = `program${p.id}`;
+            const item = { image: p.image, name: p.name || p.title };
+            mapping[numKey] = item;
+            mapping[idKey] = item;
+          });
+          setProgramMap(mapping);
+        }
+      } catch (err) {
+        console.error("Gagal mengambil gambar program untuk tiket:", err);
+      }
+    }
+    loadPrograms();
+  }, []);
+
   const handleToggleCheckbox = (id: string, currentQty: number) => {
     // Klik checkbox/nama tiket: toggle antara 0 (tidak dipilih) dan 1
     onQtyChange(id, currentQty > 0 ? 0 : 1);
@@ -74,6 +96,13 @@ export default function TicketTypesSection({
         {TICKETS.map((ticket) => {
           const qty = quantities[ticket.id] || 0;
           const isSelected = qty > 0;
+          const prog = programMap[ticket.id] || programMap[`program${ticket.id}`];
+          const posterUrl = prog?.image
+            ? formatImageUrl(prog.image)
+            : ticket.id === "all-day"
+            ? "/images/Logo Byfest 2026.svg"
+            : null;
+          const displayName = prog?.name ? `${ticket.name} (${prog.name})` : ticket.name;
 
           return (
             <div
@@ -88,7 +117,23 @@ export default function TicketTypesSection({
                 <span className="byfest-ticket-checkbox">
                   {isSelected && <span className="byfest-ticket-checkbox-inner" />}
                 </span>
-                <span className="byfest-ticket-name">{ticket.name}</span>
+
+                {/* Poster Thumbnail Program */}
+                {posterUrl && (
+                  <div className="w-[32px] h-[32px] rounded-[5px] overflow-hidden bg-black/40 border border-white/20 shrink-0 flex items-center justify-center">
+                    <img
+                      src={posterUrl}
+                      alt={ticket.name}
+                      crossOrigin="anonymous"
+                      referrerPolicy="no-referrer"
+                      className={`w-full h-full ${ticket.id === 'all-day' ? 'object-contain p-0.5' : 'object-cover'}`}
+                    />
+                  </div>
+                )}
+
+                <span className="byfest-ticket-name" title={displayName}>
+                  {displayName}
+                </span>
               </button>
 
               <div className="byfest-ticket-right">

@@ -38,7 +38,7 @@
 }
 
 .mobile-dropdown-wrapper {
-  @apply relative z-50 w-full max-w-[340px] block md:hidden mb-4;
+  @apply relative z-20 w-full max-w-[340px] block md:hidden mb-4;
 }
 
 .mobile-select-box {
@@ -74,7 +74,7 @@
 }
 
 .custom-dropdown-menu {
-  @apply absolute top-full left-0 w-full mt-2 bg-[#090E14]/40 backdrop-blur-2xl border border-white/20 rounded-xl shadow-2xl overflow-hidden py-1 z-50;
+  @apply absolute top-full left-0 w-full mt-2 bg-[#090E14]/90 backdrop-blur-2xl border border-white/20 rounded-xl shadow-2xl overflow-hidden py-1 z-30;
 }
 
 .custom-dropdown-item {
@@ -243,10 +243,18 @@
 .program-card-desc,
 .pg-card-desc {
   @apply font-sans text-[12px] text-white/80 leading-snug m-0 text-left line-clamp-2;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .film-card-desc {
   @apply font-sans text-[12px] text-white/85 leading-snug m-0 text-left line-clamp-2;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 /* Divider tipis di bawah credits FilmCard */
@@ -455,7 +463,7 @@
 }
 
 .byfest-card-modal-backdrop {
-  @apply fixed inset-0 z-[120] bg-black/75 backdrop-blur-md 
+  @apply fixed inset-0 z-[150] bg-black/80 backdrop-blur-md 
          flex items-center justify-center p-4 sm:p-6 overflow-y-auto;
 }
 

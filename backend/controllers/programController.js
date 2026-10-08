@@ -50,7 +50,7 @@ const getAllPrograms = async (req, res) => {
           model: Film,
           as: 'films',
           through: { attributes: [] }, // Sembunyikan junction table (ProgramFilm)
-          attributes: ['id', 'title', 'director', 'duration', 'poster_url', 'synopsis']
+          attributes: ['id', 'title', 'director', 'genre', 'age_rating', 'duration', 'poster_url', 'synopsis']
         },
         {
           model: TicketType,

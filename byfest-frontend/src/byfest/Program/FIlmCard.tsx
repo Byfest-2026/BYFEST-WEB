@@ -6,7 +6,6 @@ import "./program.css";
 interface FilmCardProps {
   title: string;
   director: string;
-  dop?: string;
   time?: string;
   genre?: string;
   age?: string;
@@ -19,15 +18,26 @@ interface FilmCardProps {
 export default function FilmCard({
   title,
   director,
-  dop = "Name",
-  time = "Time",
-  genre = "Genre",
-  age = "Age",
-  duration = "Duration",
+  time = "",
+  genre = "",
+  age = "",
+  duration = "",
   description = "Please add your content here. Keep it short and simple. And smile :)",
   posterImage,
 }: FilmCardProps) {
   const [showModal, setShowModal] = useState(false);
+
+  // Sembunyikan Navbar saat modal dibuka
+  useEffect(() => {
+    if (showModal) {
+      document.body.classList.add("byfest-modal-active");
+    } else {
+      document.body.classList.remove("byfest-modal-active");
+    }
+    return () => {
+      document.body.classList.remove("byfest-modal-active");
+    };
+  }, [showModal]);
 
   // Tutup modal ketika tombol Escape ditekan
   useEffect(() => {
@@ -56,27 +66,25 @@ export default function FilmCard({
 
         {/* BODY: title, credits, divider, badges, deskripsi */}
         <div className="film-card-body">
-          {/* TITLE & CREDITS */}
+          {/* TITLE & CREDITS (DOP DIHAPUS) */}
           <div className="film-card-header">
             <h4 className="film-card-title">
               {title}
             </h4>
             <p className="film-card-credits">
               Director: <strong className="film-card-credits-bold">{director}</strong>
-              <span className="film-card-credits-divider">|</span>
-              DOP: <strong className="film-card-credits-bold">{dop}</strong>
             </p>
           </div>
 
           {/* DIVIDER */}
           <div className="film-card-divider-line" />
 
-          {/* TAGS BADGES */}
+          {/* TAGS BADGES (Hanya tampil jika ada isi dan bukan '-') */}
           <div className="film-card-tags-container">
-            <span className="film-badge-time">{time}</span>
-            <span className="film-badge-genre">{genre}</span>
-            <span className="film-badge-age">{age}</span>
-            <span className="film-badge-duration">{duration}</span>
+            {time && time !== "-" && <span className="film-badge-time">{time}</span>}
+            {genre && genre !== "-" && <span className="film-badge-genre">{genre}</span>}
+            {age && age !== "-" && <span className="film-badge-age">{age}</span>}
+            {duration && duration !== "-" && <span className="film-badge-duration">{duration}</span>}
           </div>
 
           {/* DESKRIPSI FILM (STATE ASLI TETAP line-clamp-2) */}
@@ -131,21 +139,15 @@ export default function FilmCard({
               
               <p className="byfest-card-modal-credits">
                 Director: <strong className="text-white">{director}</strong>
-                {dop && dop !== "Name" && (
-                  <>
-                    <span className="mx-2 text-white/40">|</span>
-                    DOP: <strong className="text-white">{dop}</strong>
-                  </>
-                )}
               </p>
 
               <div className="film-card-divider-line my-1" />
 
               <div className="film-card-tags-container mb-1">
-                <span className="film-badge-time">{time}</span>
-                <span className="film-badge-genre">{genre}</span>
-                <span className="film-badge-age">{age}</span>
-                <span className="film-badge-duration">{duration}</span>
+                {time && time !== "-" && <span className="film-badge-time">{time}</span>}
+                {genre && genre !== "-" && <span className="film-badge-genre">{genre}</span>}
+                {age && age !== "-" && <span className="film-badge-age">{age}</span>}
+                {duration && duration !== "-" && <span className="film-badge-duration">{duration}</span>}
               </div>
 
               {/* Sinopsis Lengkap */}

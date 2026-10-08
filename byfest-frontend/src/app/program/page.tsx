@@ -77,6 +77,26 @@ export default function AllProgramPage() {
   // Ambil daftar film (Mendukung alias 'films' huruf kecil maupun 'Films' huruf besar)
   const filmList = selectedProgram?.films || selectedProgram?.Films || [];
 
+  // Helper menghitung total runtime program secara akurat dari DB atau selisih jam / durasi film
+  const getProgramRuntime = (p: any, films: any[] = []) => {
+    if (p?.runtime && p.runtime !== "-") return p.runtime;
+    if (p?.total_time && p.total_time !== "-") return p.total_time;
+    if (p?.duration && p.duration !== "-") return `${p.duration} Min`;
+    if (p?.start_time && p.end_time) {
+      const [sh, sm] = p.start_time.split(":").map(Number);
+      const [eh, em] = p.end_time.split(":").map(Number);
+      if (!isNaN(sh) && !isNaN(sm) && !isNaN(eh) && !isNaN(em)) {
+        const diff = (eh * 60 + em) - (sh * 60 + sm);
+        if (diff > 0) return `${diff} Min`;
+      }
+    }
+    if (films && films.length > 0) {
+      const sum = films.reduce((acc: number, f: any) => acc + (Number(f.duration) || 0), 0);
+      if (sum > 0) return `${sum} Min`;
+    }
+    return "";
+  };
+
   return (
     <main className="schedule-main">
       <Navbar />
@@ -164,7 +184,7 @@ export default function AllProgramPage() {
                           ? `${currentFilms.length} Films`
                           : (prog.totalFilms ? `${prog.totalFilms} Films` : "-")
                       }
-                      runtime={prog.runtime || "-"}
+                      runtime={getProgramRuntime(prog, currentFilms)}
                       image={formatImageUrl(prog.image, "/images/poster-sample.jpg")}
                       isDetail={false}
                       onViewDetail={() => setActiveFilter(`Program ${index + 1}`)}
@@ -192,7 +212,7 @@ export default function AllProgramPage() {
                       location={"Movie Room FIB A"}
                       ageRating={selectedProgram.ageRating || selectedProgram.age_rating || ""}
                       totalFilms={filmList.length}
-                      runtime={selectedProgram.runtime || "-"}
+                      runtime={getProgramRuntime(selectedProgram, filmList)}
                       image={formatImageUrl(selectedProgram.image, "/images/poster-sample.jpg")}
                       isDetail={true}
                     />
@@ -217,14 +237,15 @@ export default function AllProgramPage() {
                               key={film.id}
                               title={film.title}
                               director={film.director}
-                             time={
-                                film.start_time
-                                  ? `${film.start_time} - ${film.end_time || ""}`
-                                  : film.time || ""
+                              time={
+                                film.time ||
+                                (film.start_time
+                                  ? `${film.start_time}${film.end_time ? ' - ' + film.end_time : ''}`
+                                  : "")
                               }
                               genre={film.genre || ""}
-                              age={film.age_rating || film.age || "-"}
-                              duration={film.duration ? `${film.duration} Min` : "-"}
+                              age={film.age_rating || film.age || ""}
+                              duration={film.duration ? `${film.duration} Min` : ""}
                               description={film.synopsis || film.description}
                               posterImage={formatImageUrl(posterPath, "/images/poster-sample.jpg")}
                             />

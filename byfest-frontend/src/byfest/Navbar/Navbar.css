@@ -3,7 +3,16 @@
 
 /* Header Pembungkus Luar - Selalu Full Screen (100%) */
 .byfest-navbar {
-  @apply fixed top-0 left-0 right-0 w-full z-50 bg-white/10 backdrop-blur-[10px] border-b border-black/10 box-border;
+  @apply fixed top-0 left-0 right-0 w-full z-[100] bg-white/10 backdrop-blur-[10px] border-b border-black/10 box-border transition-all duration-200;
+}
+
+/* Sembunyikan navbar sepenuhnya ketika modal detail program/film sedang terbuka */
+body.byfest-modal-active .byfest-navbar,
+body.byfest-modal-active header.byfest-navbar {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
 }
 
 /* Pembungkus Konten - Membatasi Maksimal Lebar 1440px & Rata Tengah */
@@ -50,11 +59,11 @@
 
 /* Dropdown Menu Mobile & Desktop Navigation */
 .byfest-dropdown {
-  @apply absolute left-0 top-full w-full border-b border-black/10 text-black hidden bg-white/95 backdrop-blur-md lg:static lg:bg-transparent lg:backdrop-filter-none lg:border-b-0 lg:w-auto lg:flex;
+  @apply absolute left-0 top-full w-full border-b border-black/10 text-black hidden bg-white shadow-2xl z-[100] lg:static lg:bg-transparent lg:backdrop-filter-none lg:border-b-0 lg:w-auto lg:flex lg:shadow-none;
 }
 
 .byfest-dropdown.mobile-open {
-  @apply !block;
+  @apply !block bg-white shadow-2xl;
 }
 
 .byfest-menu-list {

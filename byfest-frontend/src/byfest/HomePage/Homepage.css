@@ -204,7 +204,11 @@
 }
 
 .program-card-desc {
-  @apply font-sans text-[11px] md:text-xs min-[1920px]:text-sm text-white/80 leading-snug m-0;
+  @apply font-sans text-[11px] md:text-xs min-[1920px]:text-sm text-white/80 leading-snug m-0 text-left line-clamp-2;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .program-info-list {

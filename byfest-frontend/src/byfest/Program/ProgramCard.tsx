@@ -40,6 +40,18 @@ export default function ProgramCard({
 }: ProgramCardProps) {
   const [showModal, setShowModal] = useState(false);
 
+  // Sinkronkan class body agar Navbar disembunyikan saat modal terbuka
+  useEffect(() => {
+    if (showModal) {
+      document.body.classList.add("byfest-modal-active");
+    } else {
+      document.body.classList.remove("byfest-modal-active");
+    }
+    return () => {
+      document.body.classList.remove("byfest-modal-active");
+    };
+  }, [showModal]);
+
   // Tutup modal ketika tombol Escape ditekan
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -52,6 +64,26 @@ export default function ProgramCard({
     }
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [showModal]);
+
+  // Hitung displayRuntime secara cerdas jika belum ada atau bernilai '-'
+  let displayRuntime = runtime && runtime !== "-" ? runtime : "";
+  if (!displayRuntime && time) {
+    const parts = time.split("-").map((t) => t.trim());
+    if (parts.length === 2) {
+      const parseMinutes = (tStr: string) => {
+        const segs = tStr.split(":").map(Number);
+        if (segs.length >= 2 && !isNaN(segs[0]) && !isNaN(segs[1])) {
+          return segs[0] * 60 + segs[1];
+        }
+        return null;
+      };
+      const startMin = parseMinutes(parts[0]);
+      const endMin = parseMinutes(parts[1]);
+      if (startMin !== null && endMin !== null && endMin > startMin) {
+        displayRuntime = `${endMin - startMin} Min`;
+      }
+    }
+  }
 
   return (
     <>
@@ -125,7 +157,7 @@ export default function ProgramCard({
           <div className="program-badges-row">
             {ageRating && <span className="badge-pill badge-age">{ageRating}</span>}
             {totalFilms && <span className="badge-pill badge-films">{totalFilms}</span>}
-            {runtime && <span className="badge-pill badge-runtime">{runtime}</span>}
+            {displayRuntime && <span className="badge-pill badge-runtime">{displayRuntime}</span>}
           </div>
 
           {/* Tombol Aksi */}
@@ -213,7 +245,7 @@ export default function ProgramCard({
               <div className="program-badges-row my-1">
                 {ageRating && <span className="badge-pill badge-age">{ageRating}</span>}
                 {totalFilms && <span className="badge-pill badge-films">{totalFilms}</span>}
-                {runtime && <span className="badge-pill badge-runtime">{runtime}</span>}
+                {displayRuntime && <span className="badge-pill badge-runtime">{displayRuntime}</span>}
               </div>
 
               {/* Info Jadwal & Lokasi */}
