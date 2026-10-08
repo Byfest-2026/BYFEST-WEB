@@ -444,3 +444,64 @@
     @apply grid-cols-2;
   }
 }
+
+/* ==========================================
+   POPUP MODAL DETAIL SINOPSIS (PROGRAM & FILM)
+   ========================================== */
+
+.program-card-readmore-hint,
+.film-card-readmore-hint {
+  @apply font-sans text-[11px] text-[#0ECDF1] font-semibold mt-0.5 cursor-pointer hover:underline flex items-center gap-1 shrink-0;
+}
+
+.byfest-card-modal-backdrop {
+  @apply fixed inset-0 z-[120] bg-black/75 backdrop-blur-md 
+         flex items-center justify-center p-4 sm:p-6 overflow-y-auto;
+}
+
+.byfest-card-modal-container {
+  @apply relative w-full max-w-[520px] rounded-[28px] overflow-hidden 
+         bg-[linear-gradient(180deg,#240E45_0%,#3F1777_100%)]
+         border border-white/25 shadow-[0_25px_60px_rgba(0,0,0,0.6)]
+         flex flex-col text-white max-h-[90vh] my-auto;
+}
+
+.byfest-card-modal-close {
+  @apply absolute top-3.5 right-3.5 z-30 w-8 h-8 rounded-full 
+         bg-black/50 hover:bg-black/80 backdrop-blur-sm border border-white/20 
+         flex items-center justify-center cursor-pointer transition-all duration-200 text-white;
+}
+
+.byfest-card-modal-cover {
+  @apply relative w-full aspect-[16/9] bg-black/40 overflow-hidden shrink-0 bg-cover bg-center;
+}
+
+.byfest-card-modal-body {
+  @apply flex flex-col p-5 sm:p-6 overflow-y-auto gap-3 text-left;
+}
+
+.byfest-card-modal-title {
+  @apply font-sans font-extrabold text-[20px] sm:text-[22px] text-white leading-tight m-0;
+}
+
+.byfest-card-modal-credits {
+  @apply font-sans text-[13px] text-white/80 m-0;
+}
+
+.byfest-card-modal-desc-box {
+  @apply w-full bg-white/10 rounded-[16px] p-4 border border-white/10 my-1;
+}
+
+.byfest-card-modal-desc-title {
+  @apply font-sans font-bold text-[12px] text-[#0ECDF1] uppercase tracking-wider mb-1.5;
+}
+
+.byfest-card-modal-desc-text {
+  @apply font-sans text-[13px] sm:text-[14px] text-white/90 leading-relaxed m-0 whitespace-pre-line max-h-[220px] overflow-y-auto pr-2;
+}
+
+.byfest-card-modal-btn-done {
+  @apply w-full py-3 rounded-full font-sans font-bold text-[14px] text-white 
+         bg-white/20 hover:bg-white/30 border border-white/25 
+         cursor-pointer transition-all duration-200 text-center mt-2;
+}

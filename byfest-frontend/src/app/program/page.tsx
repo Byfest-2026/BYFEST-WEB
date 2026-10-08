@@ -12,6 +12,18 @@ export default function AllProgramPage() {
   const [activeFilter, setActiveFilter] = useState("All Programs");
   const [programs, setPrograms] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [orderSuccessBanner, setOrderSuccessBanner] = useState<boolean>(false);
+
+  // DETEKSI REDIRECT SETELAH PEMBAYARAN TIKET
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("order_success") === "true") {
+        setOrderSuccessBanner(true);
+        window.history.replaceState({}, "", "/program");
+      }
+    }
+  }, []);
 
   // FETCH DATA PROGRAM DARI BACKEND
   useEffect(() => {
@@ -79,6 +91,38 @@ export default function AllProgramPage() {
             className="schedule-header-img"
           />
         </div>
+
+        {/* NOTIFIKASI SUKSES PEMBAYARAN TIKET */}
+        {orderSuccessBanner && (
+          <div className="w-full max-w-3xl mx-auto my-3 p-4 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-700 text-white shadow-2xl border border-emerald-300/40 flex items-start justify-between gap-3 animate-in fade-in duration-300">
+            <div className="flex items-start gap-3">
+              <div className="w-9 h-9 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center shrink-0 mt-0.5">
+                <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <div className="flex flex-col gap-0.5 text-left">
+                <h4 className="font-sans font-bold text-sm md:text-base text-white m-0">
+                  Pembayaran Berhasil Dikonfirmasi!
+                </h4>
+                <p className="font-sans text-xs md:text-sm text-emerald-100 m-0 leading-relaxed">
+                  Bukti pembayaran Anda sedang diverifikasi oleh panitia. 
+                  <strong> Tiket resmi dan QR code akan otomatis dikirimkan melalui email Anda.</strong>
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setOrderSuccessBanner(false)}
+              className="text-white/80 hover:text-white p-1 rounded-lg transition-colors shrink-0"
+              aria-label="Tutup notifikasi"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        )}
 
         {/* Filter Navigation */}
         <div className="program-filter-container">

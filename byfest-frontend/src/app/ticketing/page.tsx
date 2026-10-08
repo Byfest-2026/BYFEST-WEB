@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import "@/byfest/Ticketing/Ticketing.css";
 import Navbar from "@/byfest/Navbar/Navbar";
 import Footer from "@/byfest/Footer/Footer";
@@ -33,6 +33,7 @@ type CheckoutResponse = {
 };
 
 function TicketingContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
 
   const [ticketQty, setTicketQty] = useState<Record<string, number>>({});
@@ -209,6 +210,7 @@ function TicketingContent() {
     setFileError("");
     setSubmitError("");
     setPaymentProofFile(null);
+    router.push("/program?order_success=true");
   };
 
   return (
@@ -261,6 +263,7 @@ function TicketingContent() {
         <ConfirmationModal
           selectedTickets={selectedTickets}
           totalAmount={totalAmount}
+          buyerEmail={formData.email}
           onDone={handleDone}
         />
       )}

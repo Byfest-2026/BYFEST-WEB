@@ -317,8 +317,24 @@
   @apply font-sans text-[12px] text-gray-500 m-0 mb-2;
 }
 
+.byfest-modal-email-box {
+  @apply w-full bg-[#f3e8ff] border border-[#d8b4fe] rounded-[16px] p-3 flex flex-col gap-1 text-left my-1.5 box-border;
+}
+
+.byfest-modal-email-header {
+  @apply flex items-center gap-1.5;
+}
+
+.byfest-modal-email-title {
+  @apply font-sans font-bold text-[12px] text-[#6024A9];
+}
+
+.byfest-modal-email-desc {
+  @apply font-sans text-[11px] text-gray-700 m-0 leading-relaxed;
+}
+
 .byfest-modal-details {
-  @apply w-full flex flex-col gap-2 text-left border-t border-gray-200 pt-4;
+  @apply w-full flex flex-col gap-2 text-left border-t border-gray-200 pt-3;
 }
 
 .byfest-modal-detail-row {

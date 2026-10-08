@@ -13,12 +13,14 @@ interface ConfirmationModalProps {
   selectedTickets: SelectedTicket[];
   totalAmount: number;
   onDone: () => void;
+  buyerEmail?: string;
 }
 
 export default function ConfirmationModal({
   selectedTickets,
   totalAmount,
   onDone,
+  buyerEmail,
 }: ConfirmationModalProps) {
   // "ALL DAY PASS x1, PROGRAM 2 x1"
   const ticketTypeLabel = selectedTickets
@@ -43,8 +45,34 @@ export default function ConfirmationModal({
 
         <h3 className="byfest-modal-title">Payment Submitted!</h3>
         <p className="byfest-modal-subtitle">
-          Payment received! We&apos;ll verify it shortly.
+          Pembayaran Anda telah kami terima dan sedang diverifikasi.
         </p>
+
+        {/* Keterangan Pengiriman Tiket Melalui Email */}
+        <div className="byfest-modal-email-box">
+          <div className="byfest-modal-email-header">
+            <svg
+              className="w-4 h-4 text-[#6024A9] shrink-0"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+              />
+            </svg>
+            <span className="byfest-modal-email-title">
+              Tiket Dikirim via Email
+            </span>
+          </div>
+          <p className="byfest-modal-email-desc">
+            Tiket resmi dan bukti pemesanan akan otomatis dikirimkan ke{" "}
+            <strong>{buyerEmail || "email Anda"}</strong> setelah verifikasi selesai.
+          </p>
+        </div>
 
         <div className="byfest-modal-details">
           <div className="byfest-modal-detail-row">
@@ -70,7 +98,7 @@ export default function ConfirmationModal({
         </div>
 
         <button type="button" className="byfest-modal-done-btn" onClick={onDone}>
-          Done
+          Selesai & Ke Halaman Program &rarr;
         </button>
       </div>
     </div>
