@@ -3,8 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import "./Homepage.css";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
-const BACKEND_BASE_URL = process.env.NEXT_PUBLIC_ASSETS_URL || "http://localhost:5000";
+import { API_BASE_URL, formatImageUrl } from "@/config/api";
 
 // 1. Sesuaikan property key dengan model backend (logo_url)
 interface PartnerItem {
@@ -43,13 +42,7 @@ export const Sponsors: React.FC = () => {
     fetchPartners();
   }, []);
 
-  // 3. Perbaiki Helper URL agar tidak terjadi bentrok double slash
-  const getLogoUrl = (logoPath: string) => {
-    if (!logoPath) return "";
-    if (logoPath.startsWith('http://') || logoPath.startsWith('https://')) return logoPath;
-    const cleanPath = logoPath.startsWith('/') ? logoPath : `/${logoPath}`;
-    return `${BACKEND_BASE_URL}${cleanPath}`;
-  };
+  const getLogoUrl = (logoPath: string) => formatImageUrl(logoPath, "");
 
   // Duplikasi array jika sponsor sedikit (< 5) agar marquee tidak kosong di tengah
   const displaySponsors = sponsors.length > 0 && sponsors.length < 5

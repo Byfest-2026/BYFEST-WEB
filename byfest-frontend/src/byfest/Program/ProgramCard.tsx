@@ -17,22 +17,9 @@ interface ProgramCardProps {
   onViewDetail?: () => void;
 }
 
-// URL Host Server Backend Express
-const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+import { formatImageUrl } from "@/config/api";
 
-// Helper Function: Mengubah path relatif (uploads/...) menjadi URL lengkap ke port 5000
-const getImageUrl = (imagePath?: string) => {
-  if (!imagePath) return '';
-  if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
-    return imagePath;
-  }
-
-  // Mengubah backslash Windows (\) menjadi slash (/) dan merapikan prefix
-  const cleanPath = imagePath.replace(/\\/g, '/');
-  const formattedPath = cleanPath.startsWith('/') ? cleanPath : `/${cleanPath}`;
-
-  return `${BACKEND_URL}${formattedPath}`;
-};
+const getImageUrl = (imagePath?: string) => formatImageUrl(imagePath, '');
 
 export default function ProgramCard({
   id,

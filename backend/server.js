@@ -1,6 +1,7 @@
 require('pg'); // Memaksa bundler Vercel mendeteksi library pg
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 
 // Impor connectDB dari config/db.js
 const { connectDB } = require('./config/db');
@@ -13,6 +14,9 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Menyajikan file statis lokal /uploads (jika ada file di development lokal)
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // 2. Inisialisasi Koneksi Database (Non-blocking untuk Vercel Serverless)
 connectDB().catch((err) => {
   console.error('Database connection error during startup:', err.message);
@@ -23,6 +27,13 @@ app.get('/', (req, res) => {
   res.status(200).json({ 
     status: 'success',
     message: 'BYFEST Backend API is running successfully on Vercel!' 
+  });
+});
+
+app.get('/api', (req, res) => {
+  res.status(200).json({ 
+    status: 'success',
+    message: 'BYFEST Backend API is ready and running!' 
   });
 });
 

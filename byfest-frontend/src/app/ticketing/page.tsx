@@ -22,16 +22,10 @@ const ACCEPTED_FILE_TYPES = ["image/jpeg", "image/jpg", "image/png", "applicatio
 const MAX_QTY_PER_ITEM = 10; // samakan dengan MAX_QTY_PER_ITEM di backend
 const REQUEST_TIMEOUT_MS = 45000;
 
+import { API_BASE_URL } from "@/config/api";
+
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_RE = /^\+?\d{9,15}$/;
-
-// Base URL backend (tanpa "/api" dan tanpa "/" di akhir).
-// Prioritas: env variable Vercel, cadangan: URL backend produksi.
-const API_BASE_URL = (
-  process.env.NEXT_PUBLIC_API_URL || "https://byfest-backend.vercel.app"
-)
-  .replace(/\/+$/, "") // buang "/" di akhir
-  .replace(/\/api$/, ""); // buang "/api" kalau terlanjur ada
 
 type CheckoutResponse = {
   success?: boolean;
@@ -150,6 +144,7 @@ function TicketingContent() {
         "items",
         JSON.stringify(selectedTickets.map(({ id, qty }) => ({ id, qty })))
       );
+      payload.append("total_amount", String(totalAmount));
 
       if (paymentProofFile) {
         // Harus 'payment_proof' sesuai Multer di backend

@@ -2,9 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 
-// URL dasar API dan Host Backend untuk gambar
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
-const SERVER_BASE_URL = process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:5000";
+import { API_BASE_URL, formatImageUrl } from "@/config/api";
 
 interface LeadItem {
     id: number;
@@ -43,14 +41,10 @@ export default function Leads() {
         fetchBackendLeads();
     }, []);
 
-    // Helper untuk menangani URL gambar agar mengarah ke server Express
+    // Helper untuk menangani URL gambar agar mengarah ke server Express / Cloudinary
     const getImageUrl = (imagePath?: string) => {
         if (!imagePath) return null;
-        if (imagePath.startsWith('http')) return imagePath;
-        
-        // Memastikan ada tanda '/' di awal path
-        const cleanPath = imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
-        return `${SERVER_BASE_URL}${cleanPath}`;
+        return formatImageUrl(imagePath);
     };
 
     return (

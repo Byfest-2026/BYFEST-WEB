@@ -3,8 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
-const UPLOADS_BASE_URL = process.env.NEXT_PUBLIC_ASSET_URL || "http://localhost:5000/uploads";
+import { API_BASE_URL, formatImageUrl } from '@/config/api';
 
 interface WinnerItem {
     id: number | string;
@@ -62,18 +61,7 @@ export default function AwardsDoc() {
 
     const getImageUrl = (imagePath?: string) => {
         if (!imagePath) return null;
-        if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
-            return imagePath;
-        }
-
-        const cleanPath = imagePath.startsWith('/') ? imagePath.slice(1) : imagePath;
-
-        if (cleanPath.startsWith('uploads/')) {
-            const hostUrl = UPLOADS_BASE_URL.replace(/\/uploads\/?$/, '');
-            return `${hostUrl}/${cleanPath}`;
-        }
-
-        return `${UPLOADS_BASE_URL}/${cleanPath}`;
+        return formatImageUrl(imagePath);
     };
 
     return (

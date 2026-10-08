@@ -16,7 +16,7 @@ const getPublicIdFromUrl = (url) => {
     const parts = url.split('/');
     const filename = parts.pop().split('.')[0]; // nama file tanpa ekstensi
     const folder = parts.pop(); // byfest_bukti_tf
-    return `\({folder}/\){filename}`;
+    return `${folder}/${filename}`;
   } catch (err) {
     return null;
   }
@@ -60,38 +60,50 @@ const createOrder = async (req, res) => {
       });
     }
 
-    // A. VALIDASI & POTONG KUOTA PROGRAM
+    // A. VALIDASI & POTONG KUOTA PROGRAM (JIKA ID NUMERIK)
     for (const item of parsedItems) {
-      const program = await Program.findByPk(item.id, { transaction: t });
+      const numericId = parseInt(item.id, 10);
+      const isNumeric = !isNaN(numericId) && /^\d+$/.test(String(item.id).trim());
 
-      if (!program) {
-        await t.rollback();
-        await removeCloudinaryFile(req);
-        return res.status(404).json({
-          success: false,
-          message: `Program dengan ID ${item.id} tidak ditemukan.`
-        });
+      if (isNumeric) {
+        const program = await Program.findByPk(numericId, { transaction: t });
+
+        if (program) {
+          // Cek ketersediaan kuota jika program memiliki batas kuota
+          if (program.quota !== null && program.quota !== undefined && program.quota < item.qty) {
+            await t.rollback();
+            await removeCloudinaryFile(req);
+            return res.status(400).json({
+              success: false,
+              message: `Kuota untuk program "${program.title || program.name}" tidak mencukupi (Sisa: ${program.quota}).`
+            });
+          }
+
+          // Kurangi kuota program
+          if (program.quota !== null && program.quota !== undefined) {
+            await program.decrement('quota', {
+              by: item.qty,
+              transaction: t
+            });
+          }
+        }
       }
+    }
 
-      // Cek ketersediaan kuota
-      if (program.quota < item.qty) {
-        await t.rollback();
-        await removeCloudinaryFile(req);
-        return res.status(400).json({
-          success: false,
-          message: `Kuota untuk program "\({program.title || program.name}" tidak mencukupi (Sisa:\){program.quota}).`
-        });
+    // Hitung total_amount dengan aman (mencegah NaN pada database)
+    let finalTotal = 0;
+    if (total_amount !== undefined && total_amount !== null && !isNaN(Number(total_amount))) {
+      finalTotal = Math.round(Number(total_amount));
+    } else {
+      for (const item of parsedItems) {
+        const p = Number(item.price) || 0;
+        const q = Number(item.qty) || 1;
+        finalTotal += p * q;
       }
-
-      // Kurangi kuota program
-      await program.decrement('quota', {
-        by: item.qty,
-        transaction: t
-      });
     }
 
     // B. BUAT KODE ORDER & SIMPAN KE DATABASE
-    const orderCode = `BYF-\({Date.now().toString().slice(-6)}-\){Math.floor(1000 + Math.random() * 9000)}`;
+    const orderCode = `BYF-${Date.now().toString().slice(-6)}-${Math.floor(1000 + Math.random() * 9000)}`;
 
     // req.file.path otomatis berisi URL HTTPS publik resmi dari Cloudinary
     const paymentProofUrl = req.file.path;
@@ -102,7 +114,7 @@ const createOrder = async (req, res) => {
       phone,
       email,
       tickets_summary: typeof items === 'string' ? items : JSON.stringify(items),
-      total_amount: Number(total_amount),
+      total_amount: finalTotal,
       payment_proof: paymentProofUrl, // Menyimpan URL Cloudinary
       status: 'pending'
     }, { transaction: t });
@@ -116,7 +128,8 @@ const createOrder = async (req, res) => {
       data: {
         order_code: newOrder.order_code,
         status: newOrder.status,
-        payment_proof: newOrder.payment_proof
+        payment_proof: newOrder.payment_proof,
+        total_amount: newOrder.total_amount
       }
     });
 
@@ -189,9 +202,41 @@ const deleteOrder = async (req, res) => {
   }
 };
 
+// 5. Admin: Update Order Status
+const updateOrderStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    const order = await Order.findByPk(id);
+
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'Pesanan tidak ditemukan.' });
+    }
+
+    if (status) {
+      order.status = status;
+      await order.save();
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: `Status pesanan #${id} berhasil diubah menjadi ${status}.`,
+      data: order
+    });
+  } catch (error) {
+    console.error('Error updateOrderStatus:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal memperbarui status pesanan.',
+      error: error.message
+    });
+  }
+};
+
 module.exports = {
   createOrder,
   getAllOrders,
   getOrderById,
-  deleteOrder
+  deleteOrder,
+  updateOrderStatus
 };

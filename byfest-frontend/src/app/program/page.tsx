@@ -6,20 +6,7 @@ import Footer from "@/byfest/Footer/Footer";
 import ProgramFilter from "@/byfest/Program/ProgramFilter";
 import ProgramCard from "@/byfest/Program/ProgramCard";
 import FilmCard from "@/byfest/Program/FIlmCard";
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
-const BACKEND_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
-
-// Helper serba guna untuk merapikan URL gambar agar tidak terjadi double /uploads
-function formatImageUrl(path?: string, defaultFallback: string = "/images/poster-sample.jpg"): string {
-  if (!path) return defaultFallback;
-  if (path.startsWith("http://") || path.startsWith("https://")) return path;
-
-  // Bersihkan slash ganda di awal jika ada
-  const cleanPath = path.startsWith("/") ? path.substring(1) : path;
-
-  return `${BACKEND_BASE_URL}/${cleanPath}`;
-}
+import { API_BASE_URL, formatImageUrl } from "@/config/api";
 
 export default function AllProgramPage() {
   const [activeFilter, setActiveFilter] = useState("All Programs");
