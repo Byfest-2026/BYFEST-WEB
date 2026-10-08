@@ -59,10 +59,15 @@ function TicketingContent() {
     const programParam = searchParams.get("program");
     if (!programParam) return;
 
-    const match = TICKETS.find((t) => t.id === programParam);
+    const match = TICKETS.find(
+      (t) =>
+        t.id.toLowerCase() === programParam.toLowerCase() ||
+        t.id.toLowerCase() === `program${programParam}`.toLowerCase() ||
+        t.name.toLowerCase() === `program ${programParam}`.toLowerCase()
+    );
     if (match) {
       setTicketQty((prev) =>
-        prev[programParam] ? prev : { ...prev, [programParam]: 1 }
+        prev[match.id] ? prev : { ...prev, [match.id]: 1 }
       );
     }
   }, [searchParams]);

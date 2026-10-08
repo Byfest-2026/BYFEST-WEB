@@ -16,13 +16,13 @@ export interface TicketOption {
 // Diimpor juga oleh page.tsx (buat hitung total & pre-select dari query param)
 // dan OrderSummarySection (buat format angka).
 export const TICKETS: TicketOption[] = [
-  { id: "all-day", name: "All Day Pass", price: 120000 },
-  { id: "6", name: "Program 1", price: 35000 },
-  { id: "7", name: "Program 2", price: 35000 },
-  { id: "9", name: "Program 3", price: 35000 },
-  { id: "10", name: "Program 4", price: 35000 },
-  { id: "11", name: "Program 5", price: 35000 },
-  { id: "prog-6", name: "Program 6", price: 0 },
+  { id: "all-day", name: "All Day Pass", price: 100000 },
+  { id: "program1", name: "Program 1", price: 35000 },
+  { id: "program2", name: "Program 2", price: 35000 },
+  { id: "program3", name: "Program 3", price: 35000 },
+  { id: "program4", name: "Program 4", price: 35000 },
+  { id: "program5", name: "Program 5", price: 35000 },
+  { id: "program6", name: "Program 6", price: 0 },
 ];
 
 export const formatRupiah = (amount: number) =>
