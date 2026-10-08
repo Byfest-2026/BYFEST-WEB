@@ -1,7 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import Link from 'next/link';
+import "./program.css";
 
 interface ProgramCardProps {
   id: string | number;
@@ -39,6 +41,11 @@ export default function ProgramCard({
   onViewDetail,
 }: ProgramCardProps) {
   const [showModal, setShowModal] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Sinkronkan class body agar Navbar disembunyikan saat modal terbuka
   useEffect(() => {
@@ -194,7 +201,7 @@ export default function ProgramCard({
       </div>
 
       {/* POPUP MODAL KESELURUHAN DESKRIPSI PROGRAM */}
-      {showModal && (
+      {showModal && mounted && createPortal(
         <div 
           className="byfest-card-modal-backdrop" 
           role="dialog" 
@@ -330,7 +337,8 @@ export default function ProgramCard({
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );

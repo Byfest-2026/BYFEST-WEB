@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Hero from "@/byfest/HomePage/Hero";
 import Trailer from "@/byfest/HomePage/Trailer";
 import ProgramCard from "@/byfest/Program/ProgramCard";
+import "@/byfest/Program/program.css";
 import Sponsors from "@/byfest/HomePage/Sponsors";
 import Navbar from "@/byfest/Navbar/Navbar";
 import ScrollToTop from "@/byfest/ScrollToTop/ScrollToTop";

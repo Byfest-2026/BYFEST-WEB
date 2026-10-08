@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import "./program.css";
 
 interface FilmCardProps {
@@ -26,6 +27,11 @@ export default function FilmCard({
   posterImage,
 }: FilmCardProps) {
   const [showModal, setShowModal] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Sembunyikan Navbar saat modal dibuka
   useEffect(() => {
@@ -101,7 +107,7 @@ export default function FilmCard({
       </div>
 
       {/* POPUP MODAL KESELURUHAN SINOPSIS FILM */}
-      {showModal && (
+      {showModal && mounted && createPortal(
         <div 
           className="byfest-card-modal-backdrop" 
           role="dialog" 
@@ -167,7 +173,8 @@ export default function FilmCard({
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );
