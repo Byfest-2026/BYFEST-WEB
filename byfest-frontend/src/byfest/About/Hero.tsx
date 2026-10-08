@@ -1,7 +1,6 @@
 "use client";
-import { useRouter } from "next/navigation";
-const router = useRouter();
 import React from "react";
+import { useRouter } from "next/navigation";
 
 interface HeroProps {
   instagramEmbedUrl?: string;
@@ -10,6 +9,9 @@ interface HeroProps {
 export default function HeroSection({
   instagramEmbedUrl = "https://www.instagram.com/reel/Dd8Txh6S93d/embed",
 }: HeroProps) {
+  // ✅ BENAR: Pindahkan useRouter ke dalam komponen di sini
+  const router = useRouter();
+
   return (
     <section className="bf-hero">
       <div className="bf-hero-text">
@@ -26,14 +28,12 @@ export default function HeroSection({
           muda untuk...
         </p>
 
-       <button type="button" className="bf-hero-btn" onClick={() => router.push("/program")}>
-      Look Our Program
-      </button>
+        <button type="button" className="bf-hero-btn" onClick={() => router.push("/program")}>
+          Look Our Program
+        </button>
         
       </div>
 
-      {/* Pembungkus device (rasio potret). Header & footer Instagram dipotong,
-          hanya videonya yang terlihat. */}
       <div className="bf-hero-device">
         <div className="bf-hero-screen">
           {instagramEmbedUrl && (

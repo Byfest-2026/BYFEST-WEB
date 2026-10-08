@@ -27,9 +27,7 @@ export const BACKEND_BASE_URL = (
 
 // 3. API_BASE_URL: Selalu memiliki akhiran "/api"
 // Contoh: "https://byfest-backend.vercel.app/api" atau "http://localhost:5000/api"
-export const API_BASE_URL = rawUrl.endsWith("/api")
-  ? rawUrl
-  : `${BACKEND_BASE_URL}/api`;
+export const API_BASE_URL = `${rawUrl.replace(/\/api$/, "")}/api`;
 
 /**
  * Helper untuk memformat URL gambar/media yang berasal dari database:
