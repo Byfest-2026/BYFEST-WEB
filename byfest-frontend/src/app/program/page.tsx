@@ -56,17 +56,20 @@ export default function AllProgramPage() {
     const rawValue = activeFilter.replace("Program ", "").trim();
     const targetNumber = parseInt(rawValue, 10);
 
-    // 1. Cari berdasarkan ID asli dari database terlebih dahulu (diubah ke String agar aman)
-    const foundById = programs.find((p) => String(p.id) === String(rawValue));
-
-    if (foundById) {
-      selectedProgram = foundById;
-    } else if (!isNaN(targetNumber)) {
-      // 2. Jika ID tidak cocok, baru gunakan indeks array (1-based)
+    // 1. Utamakan urutan ke-N dalam array program (1-based index)
+    if (!isNaN(targetNumber)) {
       const index = targetNumber - 1;
       if (programs[index]) {
         selectedProgram = programs[index];
+      } else {
+        // Jika belum ada di list (misal Program 6 saat baru ada 5), set null agar menampilkan Coming Soon
+        selectedProgram = null;
       }
+    } else {
+      // 2. Jika bukan angka murni, cari berdasarkan nama
+      selectedProgram = programs.find(
+        (p) => (p.name || p.title || "").toLowerCase().includes(activeFilter.toLowerCase())
+      ) || null;
     }
   } else {
     // 3. Jika nilai activeFilter adalah Nama Program langsung (misal: "Main Competition")
@@ -261,9 +264,33 @@ export default function AllProgramPage() {
 
                 </div>
               ) : (
-                /* PERBAIKAN TAMPILAN JIKA PROGRAM BELUM ADA DI DATABASE */
-                <div className="text-center py-16">
-                  <p className="text-gray-400 text-base">Data untuk program ini belum tersedia di database.</p>
+                /* TAMPILAN KHUSUS COMING SOON UNTUK PROGRAM YANG BELUM TERSEDIA (MISAL PROGRAM 6) */
+                <div className="w-full max-w-2xl mx-auto my-12 p-8 md:p-12 rounded-3xl bg-black/50 border border-white/20 backdrop-blur-xl text-center shadow-2xl relative overflow-hidden animate-in fade-in zoom-in-95 duration-300">
+                  <div className="absolute -top-24 -left-24 w-60 h-60 bg-rose-500/10 rounded-full blur-3xl pointer-events-none" />
+                  <div className="absolute -bottom-24 -right-24 w-60 h-60 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+
+                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/15 border border-amber-500/40 text-amber-300 text-xs font-semibold tracking-wider uppercase mb-5 backdrop-blur-md">
+                    <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                    Coming Soon
+                  </div>
+
+                  <h3 className="text-2xl md:text-4xl font-extrabold text-white tracking-wide uppercase mb-3 font-sans">
+                    {activeFilter} : SEGERA HADIR
+                  </h3>
+
+                  <p className="text-gray-300 text-sm md:text-base leading-relaxed max-w-lg mx-auto mb-8 font-sans">
+                    Daftar film dan jadwal penayangan untuk <strong>{activeFilter}</strong> sedang dalam tahap finalisasi kurasi oleh panitia Brawijaya Film Festival 2026. Pantau terus linimasa kami!
+                  </p>
+
+                  <div className="flex flex-wrap items-center justify-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setActiveFilter("All Programs")}
+                      className="px-6 py-2.5 rounded-xl bg-white text-black font-bold text-xs md:text-sm hover:bg-gray-200 transition-all shadow-lg active:scale-95"
+                    >
+                      &larr; Lihat Semua Program
+                    </button>
+                  </div>
                 </div>
               )
             )}

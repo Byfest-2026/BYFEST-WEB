@@ -115,7 +115,18 @@ export default function Home() {
             {loadingCurators ? (
               <p className="text-gray-400 text-sm py-8 col-span-full text-center">Memuat data kurator...</p>
             ) : curators.length === 0 ? (
-              <p className="text-gray-400 text-sm py-8 col-span-full text-center">Belum ada data kurator saat ini.</p>
+              <div className="w-full py-6 md:py-8 px-4 text-center flex flex-col items-center justify-center">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-gray-200 text-[11px] md:text-xs font-semibold tracking-wider uppercase mb-3 backdrop-blur-sm">
+                  <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                  Announcement Soon
+                </div>
+                <h3 className="text-base md:text-xl font-bold text-white mb-2 tracking-wide font-sans">
+                  CURATORS & JURI COMING SOON
+                </h3>
+                <p className="text-gray-300 text-xs md:text-sm max-w-md mx-auto leading-relaxed">
+                  Jajaran kurator dan dewan juri ahli Brawijaya Film Festival 2026 akan segera diumumkan. Pantau terus linimasa kami!
+                </p>
+              </div>
             ) : (
               curators.map((curator) => {
                 // Utamakan atribut photo sesuai upload backend

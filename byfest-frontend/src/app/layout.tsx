@@ -65,6 +65,14 @@ const helvetica = localFont({
 export const metadata: Metadata = {
   title: "Brawijaya Film Festival 2026",
   description: "Eksibisi dan apresiasi film-film pendek di seluruh Indonesia.",
+  icons: {
+    icon: [
+      { url: "/icon.png", type: "image/png" },
+      { url: "/favicon.ico", sizes: "any" },
+    ],
+    shortcut: "/icon.png",
+    apple: "/apple-icon.png",
+  },
 };
 
 export default function RootLayout({

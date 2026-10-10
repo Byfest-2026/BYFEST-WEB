@@ -53,10 +53,7 @@ export default function TicketTypesSection({
           const mapping: Record<string, { image?: string; name?: string }> = {};
           list.forEach((p: any, idx: number) => {
             const numKey = `program${idx + 1}`;
-            const idKey = `program${p.id}`;
-            const item = { image: p.image, name: p.name || p.title };
-            mapping[numKey] = item;
-            mapping[idKey] = item;
+            mapping[numKey] = { image: p.image, name: p.name || p.title };
           });
           setProgramMap(mapping);
         }
@@ -95,27 +92,34 @@ export default function TicketTypesSection({
       <div className="byfest-ticket-list">
         {TICKETS.map((ticket) => {
           const qty = quantities[ticket.id] || 0;
-          const isSelected = qty > 0;
+          const isComingSoon = ticket.id === "program6" || ticket.price === 0;
+          const isSelected = !isComingSoon && qty > 0;
           const prog = programMap[ticket.id] || programMap[`program${ticket.id}`];
           const posterUrl = prog?.image
             ? formatImageUrl(prog.image)
             : ticket.id === "all-day"
             ? "/images/Logo Byfest 2026.svg"
             : null;
-          const displayName = prog?.name ? `${ticket.name} (${prog.name})` : ticket.name;
+          const displayName = isComingSoon
+            ? `${ticket.name} (Coming Soon)`
+            : prog?.name
+            ? `${ticket.name} (${prog.name})`
+            : ticket.name;
 
           return (
             <div
               key={ticket.id}
-              className={`byfest-ticket-card ${isSelected ? "selected" : ""}`}
+              className={`byfest-ticket-card ${isSelected ? "selected" : ""} ${isComingSoon ? "opacity-75 cursor-not-allowed" : ""}`}
             >
               <button
                 type="button"
-                className="byfest-ticket-content-left"
-                onClick={() => handleToggleCheckbox(ticket.id, qty)}
+                className={`byfest-ticket-content-left ${isComingSoon ? "cursor-not-allowed" : ""}`}
+                onClick={() => !isComingSoon && handleToggleCheckbox(ticket.id, qty)}
+                disabled={isComingSoon}
               >
                 <span className="byfest-ticket-checkbox">
                   {isSelected && <span className="byfest-ticket-checkbox-inner" />}
+                  {isComingSoon && <span className="text-gray-500 text-[10px]">&bull;</span>}
                 </span>
 
                 {/* Poster Thumbnail Program */}
@@ -137,29 +141,37 @@ export default function TicketTypesSection({
               </button>
 
               <div className="byfest-ticket-right">
-                <span className="byfest-ticket-price">
-                  {isSelected ? formatRupiah(ticket.price) : "Rp"}
-                </span>
+                {isComingSoon ? (
+                  <span className="px-2.5 py-1 rounded-md bg-amber-500/15 text-amber-300 border border-amber-500/30 text-xs font-semibold tracking-wide">
+                    Coming Soon
+                  </span>
+                ) : (
+                  <>
+                    <span className="byfest-ticket-price">
+                      {isSelected ? formatRupiah(ticket.price) : "Rp"}
+                    </span>
 
-                <div className="byfest-ticket-counter-wrapper">
-                  <button
-                    type="button"
-                    className="byfest-order-count-btn"
-                    onClick={() => handleDecrement(ticket.id, qty)}
-                    aria-label={`Kurangi jumlah ${ticket.name}`}
-                  >
-                    <span>-</span>
-                  </button>
-                  <span className="byfest-order-count-value">{qty}</span>
-                  <button
-                    type="button"
-                    className="byfest-order-count-btn"
-                    onClick={() => handleIncrement(ticket.id, qty)}
-                    aria-label={`Tambah jumlah ${ticket.name}`}
-                  >
-                    <span>+</span>
-                  </button>
-                </div>
+                    <div className="byfest-ticket-counter-wrapper">
+                      <button
+                        type="button"
+                        className="byfest-order-count-btn"
+                        onClick={() => handleDecrement(ticket.id, qty)}
+                        aria-label={`Kurangi jumlah ${ticket.name}`}
+                      >
+                        <span>-</span>
+                      </button>
+                      <span className="byfest-order-count-value">{qty}</span>
+                      <button
+                        type="button"
+                        className="byfest-order-count-btn"
+                        onClick={() => handleIncrement(ticket.id, qty)}
+                        aria-label={`Tambah jumlah ${ticket.name}`}
+                      >
+                        <span>+</span>
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           );
